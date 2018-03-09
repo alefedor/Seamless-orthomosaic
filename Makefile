@@ -1,8 +1,8 @@
 FLAGS = -O3 -Wall -Wextra -Werror -std=c++11 -Iinclude
 OPENCV = -lopencv_core -lopencv_highgui -lopencv_imgproc
 
-ortomosaic: ./bin/orthomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/best_neighbour.o ./bin/visualizer.o
-	g++ ./bin/orthomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/best_neighbour.o  ./bin/visualizer.o $(OPENCV) -o ortomosaic
+orthomosaic: ./bin/orthomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/best_neighbour.o ./bin/visualizer.o
+	g++ ./bin/orthomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/best_neighbour.o  ./bin/visualizer.o $(OPENCV) -o orthomosaic
 
 ./bin/orthomosaic.o: bin ./src/orthomosaic.cpp ./include/basic/image.h ./include/basic/reader.h
 	g++ -c -o ./bin/orthomosaic.o ./src/orthomosaic.cpp $(FLAGS)
