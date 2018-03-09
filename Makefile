@@ -1,11 +1,11 @@
 FLAGS = -O3 -Wall -Wextra -Werror -std=c++11 -Iinclude
 OPENCV = -lopencv_core -lopencv_highgui -lopencv_imgproc
 
-ortomosaic: ./bin/ortomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/best_neighbour.o ./bin/visualizer.o
-	g++ ./bin/ortomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/best_neighbour.o  ./bin/visualizer.o $(OPENCV) -o ortomosaic
+ortomosaic: ./bin/orthomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/best_neighbour.o ./bin/visualizer.o
+	g++ ./bin/orthomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/best_neighbour.o  ./bin/visualizer.o $(OPENCV) -o ortomosaic
 
-./bin/ortomosaic.o: bin ./src/ortomosaic.cpp ./include/basic/image.h ./include/basic/reader.h
-	g++ -c -o ./bin/ortomosaic.o ./src/ortomosaic.cpp $(FLAGS)
+./bin/orthomosaic.o: bin ./src/orthomosaic.cpp ./include/basic/image.h ./include/basic/reader.h
+	g++ -c -o ./bin/orthomosaic.o ./src/orthomosaic.cpp $(FLAGS)
 
 ./bin/reader.o: bin ./src/basic/reader.cpp ./include/basic/reader.h ./include/basic/image.h
 	g++ -c -o ./bin/reader.o ./src/basic/reader.cpp $(FLAGS)
@@ -24,7 +24,7 @@ ortomosaic: ./bin/ortomosaic.o ./bin/reader.o ./bin/image.o ./bin/seam.o ./bin/b
 
 clean: 
 	rm -rf ./bin
-	rm -rf ortomosaic
+	rm -rf orthomosaic
 
 bin:
 	mkdir bin -p
