@@ -17,15 +17,14 @@ int main() {
     
     Mat result = Mat(height, width, CV_8UC3);
     
-    vector<Image*> images;
+    vector<Image> images;
     Reader::readImages(images);
     for (int y = 0; y < height; y++) 
         for (int x = 0; x < width; x++) {
             unsigned char* pixel = getPixel3(result, x, y);
             pixel[0] = pixel[1] = pixel[2] = 255;
             double sum[4] = {0, 0, 0, 0};
-            for (Image* im : images) { 
-                Image &image = *im;
+            for (Image& image : images) { 
                 if (image.inside(x, y)) {
                     unsigned char *p = image.getPixel(x, y);
                     if (p[3] == 0)

@@ -24,7 +24,7 @@ void Reader::readRegionSize(int &width, int &height) {
 }
 
 
-void Reader::readImages(std::vector<Image*> &result) {
+void Reader::readImages(std::vector<Image> &result) {
     std::ifstream in("images.csv", std::ifstream::in);
     if (in.fail())
         throw std::runtime_error("Couldn't find or open file with image info");
@@ -53,8 +53,6 @@ void Reader::readImages(std::vector<Image*> &result) {
         nextpos = s.size();
         int centerY = atoi(s.substr(pos + 1, nextpos - pos - 1).c_str());
         
-        Image* image = new Image(filename, left, top, centerX, centerY);   
-               
-        result.push_back(image);
+        result.emplace_back(filename, left, top, centerX, centerY);
     }
 }

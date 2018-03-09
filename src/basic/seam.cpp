@@ -12,6 +12,14 @@ bool Edge::operator < (const Edge& e) const {
     return (dir < e.dir);     
 }
 
+void Seam::addEdge(const Edge &e) {
+    edges.insert(e);
+}
+
+Seam::Seam() {}
+
+Seam::Seam(Seam && a):edges(std::move(a.edges)) {}
+
 bool Seam::has(const Edge &e) {
     return edges.count(e);
 }
