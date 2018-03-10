@@ -20,11 +20,11 @@ int Image::getHeight() {
 }
 
 bool Image::inside(int x, int y) {
-    return x >= left && y >= top && x < left + getWidth() && y < top + getHeight() && getPixel(x, y)[3] != 0;
+    return x >= left && y >= top && x < left + getWidth() && y < top + getHeight() && (getImage().type() != CV_8UC4 || getPixel(x, y)[3] != 0);
 }
 
 unsigned char* Image::getPixel(int x, int y) {
-    return getImage().data + 4 * ((y - top) * getWidth() + (x - left)); 
+    return getImage().data + (getImage().type() == CV_8UC4 ? 4 : 3) * ((y - top) * getWidth() + (x - left)); 
 }
 
 
@@ -35,13 +35,13 @@ inline cv::Mat& Image::getImage() {
     loaded = true;
     if (image.data == nullptr)
         throw std::runtime_error("Couldn't find or read file with image " + filename);
-    if (image.type() != CV_8UC4)
+    if (image.type() != CV_8UC4 && image.type() != CV_8UC3)
         throw std::runtime_error("Incorrect type of image " + std::to_string(image.type()));
     return image;
 }
 
 static unsigned char* getMatPixel(cv::Mat &image, int x, int y, int left, int top) {
-    return image.data + 4 * ((y - top) * image.cols + (x - left)); 
+    return image.data + (image.type() == CV_8UC4 ? 4 : 3) * ((y - top) * image.cols + (x - left)); 
 }
 
 void Image::combine(Image& m, Seam& s) {

@@ -31,6 +31,8 @@ class Image {
  private:
     inline cv::Mat& getImage();
     void dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv::Mat& result);
+    
+    Image& operator=(Image& im) = delete;
 };
 
 #endif
