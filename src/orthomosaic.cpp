@@ -1,53 +1,82 @@
 #include "basic/reader.h"
 #include "basic/image.h"
+#include "solutions/best_neighbour.h"
+#include "visual/visualizer.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <iostream>
+
 using namespace std;
 using namespace cv;
 
-unsigned char* getPixel3(Mat& image, int x, int y) {
-    return image.data + 3 * (y * image.cols + x); 
-}
-
-int main() {
-    int width, height;
-    Reader::readRegionSize(width, height);
+int main(int argnum, char** args) {
+    if (argnum != 6) {
+        std::cout << "Usage: ./orthomosaic left top width height [NORMAL | SEAM | ALL]";
+        return 0;
+    }
     
-    Mat result = Mat(height, width, CV_8UC3);
+    int left = atoi(args[1]);
+    int top = atoi(args[2]);
+    int width = atoi(args[3]);
+    int height = atoi(args[4]);
+    int PYR_DOWN_COUNT = 1;
+    
+    int type;
+    if (args[5][0] == 'N')
+        type = 0;
+    else if (args[5][0] == 'S')
+        type = 1;
+    else
+        type = 2;
+    //Reader::readRegionSize(width, height);
+    
+    Image image = Image(left, top, width, height);   
     
     vector<Image> images;
     Reader::readImages(images);
-    for (int y = 0; y < height; y++) 
-        for (int x = 0; x < width; x++) {
-            unsigned char* pixel = getPixel3(result, x, y);
-            pixel[0] = pixel[1] = pixel[2] = 255;
-            double sum[4] = {0, 0, 0, 0};
-            for (Image& image : images) { 
-                if (image.inside(x, y)) {
-                    unsigned char *p = image.getPixel(x, y);
-                    if (p[3] == 0)
-                        continue;
-                    double w = 0;
-                    for (int i = 0; i < 3; i++)
-                        sum[i] += w * p[i];
-                    sum[3] += w;
-                }
+    while (!images.empty()) {
+        Image &im = images.back();
+        if (max(image.top, im.top) >= min(image.top + image.getHeight(), im.top + im.getHeight()) ||
+            max(image.left, im.left) >= min(image.left + image.getWidth(), im.left + im.getWidth())) {
+                images.pop_back();
+                continue;
             }
-                
-           if (abs(sum[3]) > 1e-6) {
-                for (int i = 0; i < 3; i++)
-                    pixel[i] = (int)(sum[i] / sum[3]); 
-           } 
+        Seam seam = getSeamBestNeighbour(image, im);
+        
+        if (type == 2) {    
+            Image copy = image.clone();    
+            Image copyim = im.clone();
+            Visualizer::markImage(copyim, 1);
+            copy.combine(copyim, seam);
+            Visualizer::showSeam(copy, seam);
+            for (int i = 0; i < PYR_DOWN_COUNT; i++)
+                 pyrDown(copy.image, copy.image, Size(copy.image.cols / 2, copy.image.rows / 2));
+    
+            imshow("Program result", copy.image);
+            waitKey(0);
+        } 
+        
+        image.combine(im, seam);
+        
+        if (type < 2) {
+            Image copy = image.clone();
+            
+            if (type == 0) {
+                //nothing to do            
+            } else
+            if (type == 1) {
+                Visualizer::showSeam(copy, seam);
+            }
+            for (int i = 0; i < PYR_DOWN_COUNT; i++)
+                 pyrDown(copy.image, copy.image, Size(copy.image.cols / 2, copy.image.rows / 2));
+        
+            imshow("Program result", copy.image);
+            waitKey(0);
         }
         
-    imwrite("result.jpg", result);
-    
-    for (int i = 0; i < 3; i++)
-        pyrDown(result, result, Size(result.cols / 2, result.rows / 2));
-        
-    imshow("Program result", result);
-    waitKey(0);
+        images.pop_back();
+    }
     return 0;
 }

@@ -35,7 +35,7 @@ void Reader::readImages(std::vector<Image> &result) {
     while (in >> s) {
         int pos;
         pos = s.find(',');
-        std::string filename = s.substr(0, pos) + ".j";
+        std::string filename = "orthophotos/" + s.substr(0, pos) + ".png";
         
         int nextpos;
         nextpos = s.find(',', pos + 1);

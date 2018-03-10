@@ -4,6 +4,6 @@
 #include "basic/image.h"
 
 
-Seam getSeamBestNeighbour(const Image& a, const Image& b);
+Seam getSeamBestNeighbour(Image& a, Image& b);
 
 #endif

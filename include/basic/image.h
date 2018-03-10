@@ -15,22 +15,22 @@ class Image {
     int top;
     int centerX;
     int centerY;
+    cv::Mat image;
+    bool loaded;
     
     Image(const std::string& filename, int left, int top, int centerX, int centerY);
     Image(int left, int top, int width, int height);
-    ~Image();
     
     int getWidth();
     int getHeight();
     bool inside(int x, int y);
     unsigned char* getPixel(int x, int y);
     void combine(Image& m, Seam& s);
+    Image clone();
     
  private:
-    cv::Mat* image;
-    
-    inline cv::Mat* getImage();
-    void dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv::Mat* result);
+    inline cv::Mat& getImage();
+    void dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv::Mat& result);
 };
 
 #endif
