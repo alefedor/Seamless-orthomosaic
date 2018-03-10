@@ -14,8 +14,8 @@ static void mark(Image &a, int x, int y, int m1, int m2, int m3) {
 
 void Visualizer::showSeam(Image &a, Seam &s) {
     for (const Edge &e : s.edges) {
-        for (int dx = -10; dx <= 10; dx++)
-            for (int dy = -10; dy <= 10; dy++)
+        for (int dx = -5; dx <= 5; dx++)
+            for (int dy = -5; dy <= 5; dy++)
                 if (a.inside(e.x + dx, e.y + dy))
                     mark(a, e.x + dx, e.y + dy, 255, 0, 0);
     }

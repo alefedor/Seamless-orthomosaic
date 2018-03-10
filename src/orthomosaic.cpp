@@ -36,6 +36,7 @@ int main(int argnum, char** args) {
     
     vector<Image> images;
     Reader::readImages(images);
+    int num = 0;
     while (!images.empty()) {
         Image &im = images.back();
         if (max(image.top, im.top) >= min(image.top + image.getHeight(), im.top + im.getHeight()) ||
@@ -44,13 +45,14 @@ int main(int argnum, char** args) {
                 continue;
             }
         Seam seam = getSeamBestNeighbour(image, im);
-        
+        num++;
         if (type == 2) {    
             Image copy = image.clone();    
             Image copyim = im.clone();
             Visualizer::markImage(copyim, 1);
             copy.combine(copyim, seam);
             Visualizer::showSeam(copy, seam);
+            imwrite("result" + to_string(num) + ".jpg", copy.image);
             for (int i = 0; i < PYR_DOWN_COUNT; i++)
                  pyrDown(copy.image, copy.image, Size(copy.image.cols / 2, copy.image.rows / 2));
     
@@ -69,6 +71,8 @@ int main(int argnum, char** args) {
             if (type == 1) {
                 Visualizer::showSeam(copy, seam);
             }
+            
+            imwrite("result" + to_string(num) + ".jpg", copy.image);
             for (int i = 0; i < PYR_DOWN_COUNT; i++)
                  pyrDown(copy.image, copy.image, Size(copy.image.cols / 2, copy.image.rows / 2));
         
