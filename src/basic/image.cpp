@@ -66,10 +66,11 @@ void Image::combine(Image& m, Seam& s) {
         for (int x = left; x < left + width; x++) 
             if (!used[y - top][x - left]){
                 unsigned char* pixel = getMatPixel(result, x, y, left, top);
-                if (pixel[3] == 0 && m.inside(x, y)) {
+                if (m.inside(x, y)) {
                     unsigned char *toPlace = m.getPixel(x, y);
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < 3; i++)
                         pixel[i] = toPlace[i];
+                    pixel[3] = 255;
                 }
             }   
     
@@ -84,8 +85,9 @@ void Image::dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv
     
     unsigned char *pixel = getMatPixel(result, x, y, left, top);
     unsigned char *toPlace = getPixel(x, y);
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 3; i++)
         pixel[i] = toPlace[i];
+    pixel[3] = 255;
     
     for (int i = 0; i < 4; i++) {
         int nx = x + dx[i];
@@ -105,4 +107,3 @@ Image Image::clone() {
     }
     return result;
 }
-
