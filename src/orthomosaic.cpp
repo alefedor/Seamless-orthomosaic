@@ -7,6 +7,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 using namespace cv;
@@ -36,6 +37,8 @@ int main(int argnum, char** args) {
     
     vector<Image> images;
     Reader::readImages(images);
+    vector<vector<double>> dist = initialBestNeighbourDist(height, width);
+    
     int num = 0;
     while (!images.empty()) {
         Image &im = images.back();
@@ -44,7 +47,7 @@ int main(int argnum, char** args) {
                 images.pop_back();
                 continue;
             }
-        Seam seam = getSeamBestNeighbour(image, im);
+        Seam seam = getSeamBestNeighbour(image, im, dist);
         num++;
         if (type == 2) {    
             Image copy = image.clone();    
