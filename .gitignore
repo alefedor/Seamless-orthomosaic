@@ -1,2 +1,4 @@
 bin/
 orthomosaic
+cmake-build-debug/
+.idea/
