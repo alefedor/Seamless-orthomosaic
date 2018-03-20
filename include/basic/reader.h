@@ -1,5 +1,4 @@
-#ifndef __READER_H_INCLUDED
-#define __READER_H_INCLUDED
+#pragma once
 
 #include <vector>
 #include "basic/image.h"
@@ -10,4 +9,3 @@ class Reader {
     static void readImages(std::vector<Image> &result);
 };
 
-#endif

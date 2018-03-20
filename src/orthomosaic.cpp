@@ -55,11 +55,11 @@ int main(int argnum, char** args) {
             Visualizer::markImage(copyim, 1);
             copy.combine(copyim, seam);
             Visualizer::showSeam(copy, seam);
-            imwrite("result" + to_string(num) + ".jpg", copy.image);
+            imwrite("result" + to_string(num) + ".jpg", copy.getImage());
             for (int i = 0; i < PYR_DOWN_COUNT; i++)
-                 pyrDown(copy.image, copy.image, Size(copy.image.cols / 2, copy.image.rows / 2));
+                 pyrDown(copy.getImage(), copy.getImage(), Size(copy.getImage().cols / 2, copy.getImage().rows / 2));
     
-            imshow("Program result", copy.image);
+            imshow("Program result", copy.getImage());
             waitKey(0);
         } 
         
@@ -75,11 +75,11 @@ int main(int argnum, char** args) {
                 Visualizer::showSeam(copy, seam);
             }
             
-            imwrite("result" + to_string(num) + ".jpg", copy.image);
+            imwrite("result" + to_string(num) + ".jpg", copy.getImage());
             for (int i = 0; i < PYR_DOWN_COUNT; i++)
-                 pyrDown(copy.image, copy.image, Size(copy.image.cols / 2, copy.image.rows / 2));
+                 pyrDown(copy.getImage(), copy.getImage(), Size(copy.getImage().cols / 2, copy.getImage().rows / 2));
         
-            imshow("Program result", copy.image);
+            imshow("Program result", copy.getImage());
             waitKey(0);
         }
         

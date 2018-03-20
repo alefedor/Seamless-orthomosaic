@@ -1,8 +1,8 @@
 #include "visual/visualizer.h"
 
 // mi == -1 means "don't change"
-static void mark(Image &a, int x, int y, int m1, int m2, int m3) {
-    unsigned char *pixel = a.getPixel(x, y);
+static void mark(Image &a, int x, int y, Pixel m1, Pixel m2, Pixel m3) {
+    Pixel *pixel = a.getPixel(x, y);
     if (m1 != -1)
         pixel[0] = m1;
     if (m2 != -1)
@@ -14,8 +14,8 @@ static void mark(Image &a, int x, int y, int m1, int m2, int m3) {
 
 void Visualizer::showSeam(Image &a, Seam &s) {
     for (const Edge &e : s.edges) {
-        for (int dx = -5; dx <= 5; dx++)
-            for (int dy = -5; dy <= 5; dy++)
+        for (int dy = -5; dy <= 5; dy++)
+            for (int dx = -5; dx <= 5; dx++)
                 if (a.inside(e.x + dx, e.y + dy))
                     mark(a, e.x + dx, e.y + dy, 255, 0, 0);
     }

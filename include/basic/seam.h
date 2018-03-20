@@ -1,5 +1,4 @@
-#ifndef __SEAM_H_INCLUDED
-#define __SEAM_H_INCLUDED
+#pragma once
 
 #include <set>
 
@@ -23,5 +22,3 @@ class Seam {
 };
 
 Edge getEdge(int x1, int y1, int x2, int y2);
-
-#endif

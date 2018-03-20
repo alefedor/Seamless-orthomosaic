@@ -1,9 +1,7 @@
 #include "basic/image.h"
-#include "basic/seam.h"
-#include <exception>
 
-Image::Image(const std::string &filename, int left, int top, int centerX, int centerY):
-    filename(filename), left(left), top(top), centerX(centerX), centerY(centerY), loaded(false) {}
+Image::Image(const std::string &filename, int left, int top, int centerX, int centerY, int width, int height):
+    filename(filename), left(left), top(top), centerX(centerX), centerY(centerY), width(width), height(height), loaded(false) {}
     
 Image::Image(int left, int top, int width, int height): left(left), top(top), loaded(true) {
     image = cv::Mat::zeros(cv::Size(height, width), CV_8UC4);
@@ -12,18 +10,18 @@ Image::Image(int left, int top, int width, int height): left(left), top(top), lo
 }
     
 int Image::getWidth() {
-    return getImage().cols;
+    return width;
 }
 
 int Image::getHeight() {
-    return getImage().rows;
+    return height;
 }
 
 bool Image::inside(int x, int y) {
     return x >= left && y >= top && x < left + getWidth() && y < top + getHeight() && (getImage().type() != CV_8UC4 || getPixel(x, y)[3] != 0);
 }
 
-unsigned char* Image::getPixel(int x, int y) {
+Pixel* Image::getPixel(int x, int y) {
     return getImage().data + (getImage().type() == CV_8UC4 ? 4 : 3) * ((y - top) * getWidth() + (x - left)); 
 }
 
@@ -33,6 +31,7 @@ inline cv::Mat& Image::getImage() {
         return image;
     image = cv::imread(filename, CV_LOAD_IMAGE_UNCHANGED);
     loaded = true;
+
     if (image.data == nullptr)
         throw std::runtime_error("Couldn't find or read file with image " + filename);
     if (image.type() != CV_8UC4 && image.type() != CV_8UC3)
@@ -40,8 +39,8 @@ inline cv::Mat& Image::getImage() {
     return image;
 }
 
-static unsigned char* getMatPixel(cv::Mat &image, int x, int y, int left, int top) {
-    return image.data + (image.type() == CV_8UC4 ? 4 : 3) * ((y - top) * image.cols + (x - left)); 
+static Pixel* getMatPixel(cv::Mat &image, int x, int y, int left, int top) {
+    return image.data + (image.type() == CV_8UC4 ? 4 : 3) * ((y - top) * image.cols + (x - left));
 }
 
 void Image::combine(Image& m, Seam& s) {
@@ -51,8 +50,8 @@ void Image::combine(Image& m, Seam& s) {
     
     std::vector<std::vector<char> > used;
     used.resize(height, std::vector<char>());
-    for (int i = 0; i < (int)used.size(); i++)
-        used[i].resize(width, false);
+    for (auto &i : used)
+        i.resize(width, false);
        
     for (int y = top; y < top + height; y++)
         for (int x = left; x < left + width; x++) {
@@ -65,9 +64,9 @@ void Image::combine(Image& m, Seam& s) {
     for (int y = top; y < top + height; y++)
         for (int x = left; x < left + width; x++) 
             if (!used[y - top][x - left]){
-                unsigned char* pixel = getMatPixel(result, x, y, left, top);
+                Pixel* pixel = getMatPixel(result, x, y, left, top);
                 if (m.inside(x, y)) {
-                    unsigned char *toPlace = m.getPixel(x, y);
+                    Pixel *toPlace = m.getPixel(x, y);
                     for (int i = 0; i < 3; i++)
                         pixel[i] = toPlace[i];
                     pixel[3] = 255;
@@ -83,8 +82,8 @@ static int dy[4] = {0, 0, 1, -1};
 void Image::dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv::Mat& result) {
     used[y - top][x - left] = true;
     
-    unsigned char *pixel = getMatPixel(result, x, y, left, top);
-    unsigned char *toPlace = getPixel(x, y);
+    Pixel *pixel = getMatPixel(result, x, y, left, top);
+    Pixel *toPlace = getPixel(x, y);
     for (int i = 0; i < 3; i++)
         pixel[i] = toPlace[i];
     pixel[3] = 255;
@@ -100,7 +99,7 @@ void Image::dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv
 }
 
 Image Image::clone() {
-    Image result = Image(filename, left, top, centerX, centerY);
+    Image result = Image(filename, left, top, centerX, centerY, width, height);
     if (loaded) {
         result.image = image.clone();
         result.loaded = true;

@@ -1,6 +1,4 @@
-#ifndef __VISUALIZER_H_INCLUDED
-#define __VISUALIZER_H_INCLUDED
-
+#pragma once
 #include "basic/image.h"
 
 class Visualizer {
@@ -9,4 +7,3 @@ class Visualizer {
     static void markImage(Image &a, int id);
 };
 
-#endif
