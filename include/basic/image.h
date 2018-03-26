@@ -25,7 +25,7 @@ class Image {
     
     int getWidth();
     int getHeight();
-    inline cv::Mat& getImage();
+    cv::Mat& getImage();
 
     bool inside(int x, int y);
     Pixel* getPixel(int x, int y);

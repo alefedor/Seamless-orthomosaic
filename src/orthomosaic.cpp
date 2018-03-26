@@ -76,8 +76,8 @@ int main(int argnum, char** args) {
             for (int i = 0; i < PYR_DOWN_COUNT; i++)
                  pyrDown(copy.getImage(), copy.getImage(), Size(copy.getImage().cols / 2, copy.getImage().rows / 2));
         
-            imshow("Program result", copy.getImage());
-            waitKey(0);
+            //imshow("Program result", copy.getImage());
+            //waitKey(0);
         }
         
         images.pop_back();

@@ -9,8 +9,11 @@ include_directories(${OpenCV_INCLUDE_DIR})
 
 set(CMAKE_CXX_STANDARD 11)
 include_directories(include)
+include_directories(maxflow_solver)
 
-set(SOURCE_FILES src/orthomosaic.cpp src/visual/visualizer.cpp src/solutions/best_neighbour.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
+set(MAXFLOW_SOURCE_FILES maxflow_solver/bk_maxflow/adjacency_list_new_interface/graph.cpp maxflow_solver/bk_maxflow/adjacency_list_new_interface/maxflow.cpp)
+set(SOURCE_FILES src/orthomosaic.cpp src/visual/visualizer.cpp src/solutions/mincut.cpp src/solutions/best_neighbour.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
+set(SOURCE_FILES ${SOURCE_FILES} ${MAXFLOW_SOURCE_FILES})
 add_executable(orthomosaic ${SOURCE_FILES})
 target_link_libraries(orthomosaic ${OpenCV_LIBRARIES})
 
