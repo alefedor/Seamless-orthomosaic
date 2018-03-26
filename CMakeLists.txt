@@ -14,3 +14,7 @@ set(SOURCE_FILES src/orthomosaic.cpp src/visual/visualizer.cpp src/solutions/bes
 add_executable(orthomosaic ${SOURCE_FILES})
 target_link_libraries(orthomosaic ${OpenCV_LIBRARIES})
 
+set(VARIANTS_SOURCE_FILES src/variants.cpp src/basic/reader.cpp src/basic/image.cpp src/basic/seam.cpp)
+add_executable(variants ${VARIANTS_SOURCE_FILES})
+target_link_libraries(variants ${OpenCV_LIBRARIES})
+

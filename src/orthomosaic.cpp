@@ -1,13 +1,10 @@
 #include "basic/reader.h"
-#include "basic/image.h"
 #include "solutions/best_neighbour.h"
 #include "visual/visualizer.h"
 
-#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 using namespace cv;
