@@ -19,10 +19,15 @@ include_directories(include)
 include_directories(maxflow_solver)
 
 set(MAXFLOW_SOURCE_FILES maxflow_solver/bk_maxflow/adjacency_list_new_interface/graph.cpp maxflow_solver/bk_maxflow/adjacency_list_new_interface/maxflow.cpp)
-set(SOURCE_FILES src/orthomosaic.cpp src/visual/visualizer.cpp src/solutions/best_neighbour.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
-#set(SOURCE_FILES ${SOURCE_FILES} ${MAXFLOW_SOURCE_FILES})
-add_executable(orthomosaic ${SOURCE_FILES})
-target_link_libraries(orthomosaic ${OpenCV_LIBRARIES})
+set(SOURCE_FILES  src/visual/visualizer.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
+set(NEIGHBOUR_SOURCE_FILES ${SOURCE_FILES} src/orthomosaic_best_neighbour.cpp src/solutions/best_neighbour.cpp)
+set(MINCUT_SOURCE_FILES ${SOURCE_FILES} ${MAXFLOW_SOURCE_FILES} src/orthomosaic_mincut.cpp src/solutions/mincut.cpp)
+
+add_executable(orthomosaic_best_neighbour ${NEIGHBOUR_SOURCE_FILES})
+target_link_libraries(orthomosaic_best_neighbour ${OpenCV_LIBRARIES})
+
+add_executable(orthomosaic_mincut ${MINCUT_SOURCE_FILES})
+target_link_libraries(orthomosaic_mincut ${OpenCV_LIBRARIES})
 
 set(VARIANTS_SOURCE_FILES src/variants.cpp src/basic/reader.cpp src/basic/image.cpp src/basic/seam.cpp)
 add_executable(variants ${VARIANTS_SOURCE_FILES})

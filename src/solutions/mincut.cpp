@@ -116,6 +116,6 @@ Seam getSeamMinCut(Image& a, Image& b) {
                 }
             }
         }
-    
+
     return result;
 }

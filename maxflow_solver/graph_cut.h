@@ -14,15 +14,13 @@ public:
 	MaxFlow(size_t numNodes) : graph(numNodes, 4 * numNodes) {}
 
 	inline void addNode(node_t n) {
-		assert(source >= 0 && sink >= 0);
-
 		node_t node_id = graph.add_node();
 
 		assert(node_id == n);
 	}
 
     inline void addTweights(node_t n, value_t source, value_t sink) {
-        graph.add_tweights(node_id, source, sink);
+        graph.add_tweights(n, source, sink);
     }
 
 	inline void addEdge(node_t n1, node_t n2, value_t capacity, value_t reverseCapacity) {

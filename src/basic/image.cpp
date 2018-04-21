@@ -3,7 +3,7 @@
 Image::Image(const std::string &filename, int left, int top, int centerX, int centerY, int width, int height):
     filename(filename), left(left), top(top), centerX(centerX), centerY(centerY), width(width), height(height), loaded(false) {}
     
-Image::Image(int left, int top, int width, int height): left(left), top(top), loaded(true), width(width), height(height) {
+Image::Image(int left, int top, int width, int height): left(left), top(top), width(width), height(height), loaded(true) {
     image = cv::Mat::zeros(cv::Size(width, height), CV_8UC4);
     centerX = centerY = -1;
     filename = "";
