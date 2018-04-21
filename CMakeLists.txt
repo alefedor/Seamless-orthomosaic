@@ -7,13 +7,20 @@ if (NOT OpenCV_FOUND)
 endif()
 include_directories(${OpenCV_INCLUDE_DIR})
 
+set(CMAKE_BUILD_TYPE Debug)
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
 set(CMAKE_CXX_STANDARD 11)
 include_directories(include)
 include_directories(maxflow_solver)
 
 set(MAXFLOW_SOURCE_FILES maxflow_solver/bk_maxflow/adjacency_list_new_interface/graph.cpp maxflow_solver/bk_maxflow/adjacency_list_new_interface/maxflow.cpp)
-set(SOURCE_FILES src/orthomosaic.cpp src/visual/visualizer.cpp src/solutions/mincut.cpp src/solutions/best_neighbour.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
-set(SOURCE_FILES ${SOURCE_FILES} ${MAXFLOW_SOURCE_FILES})
+set(SOURCE_FILES src/orthomosaic.cpp src/visual/visualizer.cpp src/solutions/best_neighbour.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
+#set(SOURCE_FILES ${SOURCE_FILES} ${MAXFLOW_SOURCE_FILES})
 add_executable(orthomosaic ${SOURCE_FILES})
 target_link_libraries(orthomosaic ${OpenCV_LIBRARIES})
 

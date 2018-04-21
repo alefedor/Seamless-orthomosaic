@@ -18,7 +18,7 @@ void Reader::readRegionSize(int &width, int &height) {
 
     getline(in, s2, '=');
     getline(in, s2);
-    width = atoi(s2.c_str());
+    height = atoi(s2.c_str());
 
     if (in.fail())
         throw std::runtime_error("Couldn't read region size info");

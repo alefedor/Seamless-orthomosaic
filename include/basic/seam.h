@@ -2,21 +2,20 @@
 
 #include <set>
 
-
 struct Edge {
     int x;
     int y;
     bool dir; // 0 -- down, 1 -- right
     
-    bool operator <(const Edge &e) const;
+    bool operator <(const Edge e) const;
 };
 
 class Seam {
  public:
     std::set<Edge> edges;
  
-    bool has(const Edge &e);
-    void addEdge(const Edge &e);
+    bool has(const Edge e);
+    void addEdge(const Edge e);
     Seam();
     Seam(Seam && a);
 };
