@@ -23,10 +23,10 @@ static bool inSeam(Image &a, Image &b, int x1, int y1, int x2, int y2, std::vect
 Seam getSeamBestNeighbour(Image& a, Image& b, std::vector<std::vector<double>>& dist) {
     Seam result;
     int intersectionTop = std::max(a.top, b.top);
-    int intersectionBottom = std::min(a.top + a.getHeight(), b.top + b.getHeight()); // bottom not included
+    int intersectionBottom = std::min(a.top + a.height, b.top + b.height); // bottom not included
     int intersectionHeight = intersectionBottom - intersectionTop;
     int intersectionLeft = std::max(a.left, b.left);
-    int intersectionRight = std::min(a.left + a.getWidth(), b.left + b.getWidth()); // right not included
+    int intersectionRight = std::min(a.left + a.width, b.left + b.width); // right not included
     int intersectionWidth = intersectionRight - intersectionLeft;
     if (intersectionHeight < 1 || intersectionWidth < 1)
         return result; // no intersection => no Seam

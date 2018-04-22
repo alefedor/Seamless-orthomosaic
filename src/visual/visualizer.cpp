@@ -22,8 +22,8 @@ void Visualizer::showSeam(Image &a, Seam &s) {
 }
 
 void Visualizer::markImage(Image &a, int id) {
-    int bottom = a.top + a.getHeight();
-    int right = a.left + a.getWidth();
+    int bottom = a.top + a.height;
+    int right = a.left + a.width;
     int m1 = -1, m2 = -1, m3 = -1;
     if (id % 3 == 0) {
         m1 = ((id / 3 + 1) * 100) % 256;

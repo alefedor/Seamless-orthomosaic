@@ -26,10 +26,10 @@ static unsigned int getId(int x, int y, int intersectionTop, int intersectionLef
 Seam getSeamMinCut(Image& a, Image& b) {
     Seam result;
     int intersectionTop = std::max(a.top, b.top);
-    int intersectionBottom = std::min(a.top + a.getHeight(), b.top + b.getHeight()); // bottom not included
+    int intersectionBottom = std::min(a.top + a.height, b.top + b.height); // bottom not included
     int intersectionHeight = intersectionBottom - intersectionTop;
     int intersectionLeft = std::max(a.left, b.left);
-    int intersectionRight = std::min(a.left + a.getWidth(), b.left + b.getWidth()); // right not included
+    int intersectionRight = std::min(a.left + a.width, b.left + b.width); // right not included
     int intersectionWidth = intersectionRight - intersectionLeft;
     if (intersectionHeight < 1 || intersectionWidth < 1)
         return result; // no intersection => no Seam

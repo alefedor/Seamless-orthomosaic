@@ -8,21 +8,13 @@ Image::Image(int left, int top, int width, int height): left(left), top(top), wi
     centerX = centerY = -1;
     filename = "";
 }
-    
-int Image::getWidth() {
-    return width;
-}
-
-int Image::getHeight() {
-    return height;
-}
 
 bool Image::inside(int x, int y) {
-    return x >= left && y >= top && x < left + getWidth() && y < top + getHeight() && (getImage().type() != CV_8UC4 || getPixel(x, y)[3] != 0);
+    return x >= left && y >= top && x < left + width && y < top + height && (getImage().type() != CV_8UC4 || getPixel(x, y)[3] != 0);
 }
 
 Pixel* Image::getPixel(int x, int y) {
-    return getImage().data + (getImage().type() == CV_8UC4 ? 4 : 3) * ((y - top) * getWidth() + (x - left)); 
+    return getImage().data + (getImage().type() == CV_8UC4 ? 4 : 3) * ((y - top) * height + (x - left));
 }
 
 
@@ -44,8 +36,6 @@ static Pixel* getMatPixel(cv::Mat &image, int x, int y, int left, int top) {
 }
 
 void Image::combine(Image& m, Seam& s) {
-    int height = getHeight();
-    int width = getWidth();
     cv::Mat result = cv::Mat::zeros(cv::Size(width, height), CV_8UC4);
     
     std::vector<std::vector<char> > used;

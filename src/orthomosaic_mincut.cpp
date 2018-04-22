@@ -30,17 +30,17 @@ int main(int argnum, char** args) {
     int num = 0;
     while (!images.empty()) {
         Image &im = images.back();
-        if (max(image.top, im.top) >= min(image.top + image.getHeight(), im.top + im.getHeight()) ||
-            max(image.left, im.left) >= min(image.left + image.getWidth(), im.left + im.getWidth())) {
+        if (max(image.top, im.top) >= min(image.top + image.height, im.top + im.height) ||
+            max(image.left, im.left) >= min(image.left + image.width, im.left + im.width)) {
             images.pop_back();
             continue;
         }
-        
+
         Seam seam = getSeamMinCut(image, im);
         num++;
 
         imwrite("result" + to_string(num) + ".jpg", image.getImage());
-        
+
         images.pop_back();
     }
     return 0;

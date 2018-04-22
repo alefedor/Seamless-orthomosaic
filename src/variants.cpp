@@ -49,18 +49,31 @@ int main(int argnum, char** args) {
         int numN = 0;
         int numS = 0;
         bool bad = false;
+        int mnx = 1e9, mxx = -1e9, mny = 1e9, mxy = -1e9;
         for (auto &image : images) {
             if (intersects(x, y, width, height, image)) {
+                mnx = min(mnx, image.left);
+                mny = min(mny, image.top);
+                mxx = max(mxx, image.left + image.width);
+                mxy = max(mxy, image.top + image.height);
                 numN++;
                 if (intersectsSignificantly(x, y, width, height, image))
                     numS++;
-                if (square(x, y, width, height, image) > 0.6 * s) {
+                if (square(x, y, width, height, image) > 0.7 * s) {
                     bad = true;
                     break;
                 }
             }
         }
-        if (bad) {
+        if (x + width - mxx > 0.2 * width)
+            bad = true;
+        if (y + height - mxy > 0.2 * height)
+            bad = true;
+        if (mnx - x > 0.2 * width)
+            bad = true;
+        if (mny - y > 0.2 * height)
+            bad = true;
+        if (bad || numS < 2) {
             i--;
             continue;
         }

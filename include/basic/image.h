@@ -22,9 +22,7 @@ class Image {
 
     Image(const std::string& filename, int left, int top, int centerX, int centerY, int width, int height);
     Image(int left, int top, int width, int height);
-    
-    int getWidth();
-    int getHeight();
+
     cv::Mat& getImage();
 
     bool inside(int x, int y);
