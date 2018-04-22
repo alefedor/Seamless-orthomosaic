@@ -37,6 +37,7 @@ int main(int argnum, char** args) {
         }
 
         Seam seam = getSeamMinCut(image, im);
+        image.combine(im, seam);
         num++;
 
         imwrite("result" + to_string(num) + ".jpg", image.getImage());

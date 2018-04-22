@@ -34,7 +34,7 @@ Seam getSeamMinCut(Image& a, Image& b) {
     if (intersectionHeight < 1 || intersectionWidth < 1)
         return result; // no intersection => no Seam
 
-    MaxFlow<unsigned int> maxFlow((intersectionWidth + 2) * (intersectionHeight + 2));
+    MaxFlow<unsigned int> maxFlow(intersectionWidth * intersectionHeight);
 
     //  source = image a, sink = image b
 

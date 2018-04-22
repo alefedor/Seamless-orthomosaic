@@ -1,0 +1,32 @@
+diff --git a/src/solutions/mincut.cpp b/src/solutions/mincut.cpp
+index 40fe381..c6d41de 100644
+--- a/src/solutions/mincut.cpp
++++ b/src/solutions/mincut.cpp
+@@ -2,6 +2,8 @@
+ #include "basic/image.h"
+ #include "graph_cut.h"
+ 
++#include <iostream>
++
+ static int getI(Image &a, int x, int y) {
+     Pixel *p = a.getPixel(x, y);
+     return p[0] + (int)p[1] + p[2];
+@@ -34,7 +36,7 @@ Seam getSeamMinCut(Image& a, Image& b) {
+     if (intersectionHeight < 1 || intersectionWidth < 1)
+         return result; // no intersection => no Seam
+ 
+-    MaxFlow<unsigned int> maxFlow((intersectionWidth + 2) * (intersectionHeight + 2));
++    MaxFlow<unsigned int> maxFlow(intersectionWidth * intersectionHeight);
+ 
+     //  source = image a, sink = image b
+ 
+@@ -117,5 +119,8 @@ Seam getSeamMinCut(Image& a, Image& b) {
+             }
+         }
+ 
++    for (Edge e : result.edges)
++        std::cout << e.x <<  " " << e.y << " " << e.dir << std::endl;
++    std::cout << result.edges.size() << std::endl;
+     return result;
+ }
+\ No newline at end of file

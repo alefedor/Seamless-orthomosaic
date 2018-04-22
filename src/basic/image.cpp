@@ -14,7 +14,7 @@ bool Image::inside(int x, int y) {
 }
 
 Pixel* Image::getPixel(int x, int y) {
-    return getImage().data + (getImage().type() == CV_8UC4 ? 4 : 3) * ((y - top) * height + (x - left));
+    return getImage().data + (getImage().type() == CV_8UC4 ? 4 : 3) * ((y - top) * width + (x - left));
 }
 
 
@@ -71,7 +71,7 @@ static int dy[4] = {0, 0, 1, -1};
 
 void Image::dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv::Mat& result) {
     used[y - top][x - left] = true;
-    
+
     Pixel *pixel = getMatPixel(result, x, y, left, top);
     Pixel *toPlace = getPixel(x, y);
     for (int i = 0; i < 3; i++)
