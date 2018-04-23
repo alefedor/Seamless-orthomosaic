@@ -4,6 +4,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
+#include <visual/visualizer.h>
 
 using namespace std;
 using namespace cv;
@@ -36,11 +37,25 @@ int main(int argnum, char** args) {
             continue;
         }
 
+
         Seam seam = getSeamMinCut(image, im);
+
+
+        Image copySeam = image.clone();
+        Image copyMark = image.clone();
+
+
         image.combine(im, seam);
+
+        copySeam.combine(im, seam);
+        Visualizer::showSeam(copySeam, seam);
+        Visualizer::markImage(im, 1);
+        copyMark.combine(im, seam);
         num++;
 
         imwrite("result" + to_string(num) + ".jpg", image.getImage());
+        imwrite("result_seam" + to_string(num) + ".jpg", copySeam.getImage());
+        imwrite("result_mark" + to_string(num) + ".jpg", copyMark.getImage());
 
         images.pop_back();
     }
