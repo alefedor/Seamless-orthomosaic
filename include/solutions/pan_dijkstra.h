@@ -2,6 +2,6 @@
 
 #include "solutions/seam_solver.h"
 
-class PanDijkstra final : SeamSolver {
+class PanDijkstra final : public SeamSolver {
     Seam getSeam(Image& a, Image& b) final;
 };
