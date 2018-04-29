@@ -5,5 +5,5 @@
 template <typename T>
 class PixelEnergy {
  public:
-    virtual T calcEnergy(int x, int y) = delete;
+    virtual T calcEnergy(int x, int y) = 0;
 };

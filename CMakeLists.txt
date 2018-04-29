@@ -19,7 +19,7 @@ include_directories(include)
 include_directories(maxflow_solver)
 
 set(MAXFLOW_SOURCE_FILES maxflow_solver/bk_maxflow/adjacency_list_new_interface/graph.cpp maxflow_solver/bk_maxflow/adjacency_list_new_interface/maxflow.cpp)
-set(SOURCE_FILES  src/visual/visualizer.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
+set(SOURCE_FILES  src/runner/runner.cpp src/visual/visualizer.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
 set(NEIGHBOUR_SOURCE_FILES ${SOURCE_FILES} src/orthomosaic_best_neighbour.cpp src/solutions/best_neighbour.cpp)
 set(MINCUT_SOURCE_FILES ${SOURCE_FILES} ${MAXFLOW_SOURCE_FILES} src/orthomosaic_mincut.cpp src/solutions/mincut.cpp)
 
@@ -34,7 +34,7 @@ add_executable(variants ${VARIANTS_SOURCE_FILES})
 target_link_libraries(variants ${OpenCV_LIBRARIES})
 
 set(PAN_DIJKSTRA_SOURCE_FILES ${SOURCE_FILES} src/energy/pan_energy.cpp src/energy/pan_pixel_energy.cpp)
-add_executable(pan_dijkstra ${PAN_DIJKSTRA_SOURCE_FILES})
-target_link_libraries(pan_dijkstra ${OpenCV_LIBRARIES})
+add_executable(orthomosaic_pan_dijkstra ${PAN_DIJKSTRA_SOURCE_FILES})
+target_link_libraries(orthomosaic_pan_dijkstra ${OpenCV_LIBRARIES})
 
 

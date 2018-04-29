@@ -5,5 +5,5 @@
 template <typename T>
 class Energy {
  public:
-    virtual T calcEnergy(int x1, int y1, int x2, int y2) = delete;
+    virtual T calcEnergy(int x1, int y1, int x2, int y2) = 0;
 };
