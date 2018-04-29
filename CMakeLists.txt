@@ -29,7 +29,12 @@ target_link_libraries(orthomosaic_best_neighbour ${OpenCV_LIBRARIES})
 add_executable(orthomosaic_mincut ${MINCUT_SOURCE_FILES})
 target_link_libraries(orthomosaic_mincut ${OpenCV_LIBRARIES})
 
-set(VARIANTS_SOURCE_FILES src/variants.cpp src/basic/reader.cpp src/basic/image.cpp src/basic/seam.cpp)
+set(VARIANTS_SOURCE_FILES src/variants.cpp ${SOURCE_FILES})
 add_executable(variants ${VARIANTS_SOURCE_FILES})
 target_link_libraries(variants ${OpenCV_LIBRARIES})
+
+set(PAN_DIJKSTRA_SOURCE_FILES ${SOURCE_FILES} src/energy/pan_energy.cpp src/energy/pan_pixel_energy.cpp)
+add_executable(pan_dijkstra ${PAN_DIJKSTRA_SOURCE_FILES})
+target_link_libraries(pan_dijkstra ${OpenCV_LIBRARIES})
+
 
