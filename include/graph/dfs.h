@@ -11,7 +11,6 @@ static inline int mDist(std::pair<int, int> a, std::pair<int, int> b) {
     return abs(a.first - b.first) + abs(a.second - b.second);
 }
 
-// should be equal to that in dijkstra.cpp
 template <typename T>
 static inline bool satisfy(int x, int y, std::pair<int, int> start, std::pair<int, int> end, PixelEnergy<T> &energy, T limit) {
     return mDist({x, y}, end) < 10 || mDist({x, y}, start) < 10 || energy.calcEnergy(x, y) <= limit;
@@ -22,6 +21,8 @@ static bool dfs(Image &a, Image &b, std::pair<int, int> v, std::pair<int, int> &
                 int left, int top, std::vector<std::vector<char> > &used, PixelEnergy<T> &energy, T limit) {
     if (v == end)
         return true;
+
+    used[v.second - top][v.first - left] = true;
 
     static int dx[8] = {0, 0, 1, -1, 1, 1, -1, -1};
     static int dy[8] = {1, -1, 0, 0, -1, 1, 1, -1};

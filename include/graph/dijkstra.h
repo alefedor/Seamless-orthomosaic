@@ -12,7 +12,6 @@ std::vector<std::pair<int, int>> dijkstra(Image &a, Image &b, std::pair<int, int
 
 static inline int mDist(std::pair<int, int> a, std::pair<int, int> b);
 
-// should be equal to that in dfs.cpp
 template <typename T>
 static inline bool satisfy(int x, int y, std::pair<int, int> start, std::pair<int, int> end, PixelEnergy<T> &energy, T limit);
 

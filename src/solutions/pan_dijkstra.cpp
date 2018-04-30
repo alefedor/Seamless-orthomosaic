@@ -6,12 +6,15 @@
 #include <set>
 #include <vector>
 
+#include <opencv2/imgproc/imgproc.hpp> // for bottleneck
+
+
 static int dx[8] = {0, 0, 1, -1, 1, 1, -1, -1};
 static int dy[8] = {1, -1, 0, 0, -1, 1, 1, -1};
 
 static const int iterCount = 15;
 
-static bool hasNear(std::pair<int, int> a, std::vector<std::pair<int, int>> v) {
+static bool hasNear(std::pair<int, int> &a, std::vector<std::pair<int, int>> &v) {
     for (auto &b : v)
         if (abs(a.first - b.first) + abs(a.second - b.second) < 5)
             return true;
@@ -78,6 +81,26 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
         else
             l = m;
     }
+
+    //VISUALISATION
+
+    cv::Mat image = cv::Mat::zeros(cv::Size(intersectionWidth, intersectionHeight), CV_8UC4);
+    for (int y = intersectionTop; y < intersectionBottom; y++)
+        for (int x = intersectionLeft; x < intersectionRight; x++)
+            if (a.inside(x, y) && b.inside(x, y))
+                if (pixelEnergy.calcEnergy(x, y) <= r) {
+                    Pixel* to = image.data + (y - intersectionTop) * intersectionWidth + x - intersectionLeft;
+                    Pixel* from = a.getPixel(x, y);
+                    if (image.type() == CV_8UC4)
+                        to[3] = 255;
+
+                    for (int i = 0; i < 3; i++)
+                        to[i] = from[i];
+                }
+
+    cv::imwrite("result_bottleneck_area.jpg", image);
+
+    //VISUALISATION
 
     std::vector<std::pair<int, int>> pixels = dijkstra(a, b, start, end, energy, pixelEnergy, r);
     for (auto &a : pixels)
