@@ -6,10 +6,17 @@
 #include <set>
 #include <vector>
 
-static int dx[8] = {0, 0, 1, 1, 1, -1, -1, -1};
-static int dy[8] = {1, -1, 0, 1, -1, 0, 1, -1};
+static int dx[8] = {0, 0, 1, -1, 1, 1, -1, -1};
+static int dy[8] = {1, -1, 0, 0, -1, 1, 1, -1};
 
 static const int iterCount = 15;
+
+static bool hasNear(std::pair<int, int> a, std::vector<std::pair<int, int>> v) {
+    for (auto &b : v)
+        if (abs(a.first - b.first) + abs(a.second - b.second) < 5)
+            return true;
+    return false;
+}
 
 // works only when intersection area is a single component
 Seam PanDijkstra::getSeam(Image& a, Image& b) {
@@ -28,7 +35,7 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
     if (intersectionHeight < 1 || intersectionWidth < 1)
         return result; // no intersection => no Seam
 
-    std::set<std::pair<int, int>> intr;
+    std::vector<std::pair<int, int>> intr;
 
     for (int y = intersectionTop; y < intersectionBottom; y++)
         for (int x = intersectionLeft; x < intersectionRight; x++)
@@ -44,39 +51,39 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
                 }
 
                 if (good) {
-                    intr.insert({x, y});
+                    std::pair<int, int> p = {x, y};
+                    if (!hasNear(p, intr))
+                        intr.push_back(p);
                 }
             }
 
-    if (intr.empty()) {
+    if (intr.size() < 2) {
         return result; // one image is in another => no seam is good seam
     }
 
-    std::vector<std::pair<int, int>> start;
-    std::vector<std::pair<int, int>> end;
-
-    find_component(intr.begin() -> first, intr.begin() -> second, intr, start);
-
-    if (intr.empty()) {
-        return result; // one image is in another => no seam is good seam
-    }
-
-    find_component(intr.begin() -> first, intr.begin() -> second, intr, end);
-
-    if (!intr.empty()) {
+    if (intr.size() > 2) {
         throw std::runtime_error("Difficult areas of intersection not supported yet (single component required)");
     }
+
+    std::pair<int, int> start = intr[0];
+    std::pair<int, int> end = intr[1];
 
     double l = 0, r = 1000;
     int interCnt = iterCount;
 
     while (interCnt--) {
         double m = (l + r) / 2;
-        if (hasPath(a, b, *start.begin(), *end.begin(), pixelEnergy, m))
+        if (hasPath(a, b, start, end, pixelEnergy, m))
             r = m;
         else
             l = m;
     }
 
+    std::vector<std::pair<int, int>> pixels = dijkstra(a, b, start, end, energy, pixelEnergy, r);
+    for (auto &a : pixels)
+        for (int i = 0; i < 4; i++) { // first 4 are without diagonals
+            result.addEdge(getEdge(a.first, a.second, a.first + dx[i], a.second + dy[i]));
+        }
 
+    return result;
 }

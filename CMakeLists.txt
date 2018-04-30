@@ -33,7 +33,7 @@ set(VARIANTS_SOURCE_FILES src/variants.cpp ${SOURCE_FILES})
 add_executable(variants ${VARIANTS_SOURCE_FILES})
 target_link_libraries(variants ${OpenCV_LIBRARIES})
 
-set(PAN_DIJKSTRA_SOURCE_FILES ${SOURCE_FILES} src/orthomosaic_pan_dijkstra.cpp src/solutions/pan_dijkstra.cpp src/graph/dijkstra.cpp src/graph/dfs.cpp src/energy/pan_energy.cpp src/energy/pan_pixel_energy.cpp)
+set(PAN_DIJKSTRA_SOURCE_FILES ${SOURCE_FILES} src/orthomosaic_pan_dijkstra.cpp src/solutions/pan_dijkstra.cpp src/energy/pan_energy.cpp src/energy/pan_pixel_energy.cpp)
 add_executable(orthomosaic_pan_dijkstra ${PAN_DIJKSTRA_SOURCE_FILES})
 target_link_libraries(orthomosaic_pan_dijkstra ${OpenCV_LIBRARIES})
 
