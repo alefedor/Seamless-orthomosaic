@@ -16,7 +16,7 @@ static const int iterCount = 15;
 
 static bool hasNear(std::pair<int, int> &a, std::vector<std::pair<int, int>> &v) {
     for (auto &b : v)
-        if (abs(a.first - b.first) + abs(a.second - b.second) < 5)
+        if (abs(a.first - b.first) + abs(a.second - b.second) < 20)
             return true;
     return false;
 }
@@ -65,7 +65,13 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
     }
 
     if (intr.size() > 2) {
-        throw std::runtime_error("Difficult areas of intersection not supported yet (single component required)");
+        throw std::runtime_error("Difficult areas of intersection not supported yet (single component required). "
+                                 + std::to_string(intr[0].first) + " "
+                                 + std::to_string(intr[0].second) + "; "
+                                 + std::to_string(intr[1].first) + " "
+                                 + std::to_string(intr[1].second) + "; "
+                                 + std::to_string(intr[2].first) + " "
+                                 + std::to_string(intr[2].second) + "; ");
     }
 
     std::pair<int, int> start = intr[0];

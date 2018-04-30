@@ -10,8 +10,7 @@ Image::Image(int left, int top, int width, int height): left(left), top(top), wi
 }
 
 bool Image::inside(int x, int y) {
-    return x >= left && y >= top && x < left + width && y < top + height && (getImage().type() != CV_8UC4 || getPixel(x, y)[3] != 0)
-            && (getPixel(x, y)[0] != 255 || getPixel(x, y)[1] != 255 || getPixel(x, y)[2] != 255); // crutch for this dataset
+    return x >= left && y >= top && x < left + width && y < top + height && (getImage().type() != CV_8UC4 || getPixel(x, y)[3] != 0);
 }
 
 Pixel* Image::getPixel(int x, int y) {
