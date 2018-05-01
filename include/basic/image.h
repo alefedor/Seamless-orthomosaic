@@ -9,6 +9,8 @@
 
 typedef unsigned char Pixel;
 
+const Pixel magic[3] = {255, 158, 250};
+
 class Image {
  public:
     std::string filename;
@@ -38,7 +40,8 @@ class Image {
 };
 
 inline bool Image::inside(int x, int y) {
-    return x >= left && y >= top && x < left + width && y < top + height && (image.type() != CV_8UC4 || getPixel(x, y)[3] != 0);
+    return x >= left && y >= top && x < left + width && y < top + height && (image.type() != CV_8UC4 || getPixel(x, y)[3] != 0)
+            && (getPixel(x, y)[0] != magic[0] || getPixel(x, y)[1] != magic[1] || getPixel(x, y)[2] != magic[2]); // crutch
 }
 
 inline Pixel* Image::getPixel(int x, int y) {

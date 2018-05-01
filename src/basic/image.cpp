@@ -22,7 +22,7 @@ void Image::loadImage() {
     return;
 }
 
-static Pixel* getMatPixel(cv::Mat &image, int x, int y, int left, int top) {
+static inline Pixel* getMatPixel(cv::Mat &image, int x, int y, int left, int top) {
     return image.data + (image.type() == CV_8UC4 ? 4 : 3) * ((y - top) * image.cols + (x - left));
 }
 
