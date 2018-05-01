@@ -10,4 +10,5 @@ class PanPixelEnergy : public PixelEnergy<double> {
  private:
     Image &a;
     Image &b;
+    cv::Mat image;
 };
