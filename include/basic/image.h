@@ -19,11 +19,12 @@ class Image {
     int width;
     int height;
     bool loaded;
+    cv::Mat image;
 
     Image(const std::string& filename, int left, int top, int centerX, int centerY, int width, int height);
     Image(int left, int top, int width, int height);
 
-    cv::Mat& getImage();
+    void loadImage();
 
     bool inside(int x, int y);
     Pixel* getPixel(int x, int y);
@@ -31,9 +32,15 @@ class Image {
     Image clone();
     
  private:
-    cv::Mat image;
     void dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv::Mat& result);
     
     Image& operator=(Image& im) = delete;
 };
 
+inline bool Image::inside(int x, int y) {
+    return x >= left && y >= top && x < left + width && y < top + height && (image.type() != CV_8UC4 || getPixel(x, y)[3] != 0);
+}
+
+inline Pixel* Image::getPixel(int x, int y) {
+    return image.data + (image.type() == CV_8UC4 ? 4 : 3) * ((y - top) * width + (x - left));
+}

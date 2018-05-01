@@ -9,18 +9,9 @@ Image::Image(int left, int top, int width, int height): left(left), top(top), wi
     filename = "";
 }
 
-bool Image::inside(int x, int y) {
-    return x >= left && y >= top && x < left + width && y < top + height && (getImage().type() != CV_8UC4 || getPixel(x, y)[3] != 0);
-}
-
-Pixel* Image::getPixel(int x, int y) {
-    return getImage().data + (getImage().type() == CV_8UC4 ? 4 : 3) * ((y - top) * width + (x - left));
-}
-
-
-inline cv::Mat& Image::getImage() {
+void Image::loadImage() {
     if (loaded)
-        return image;
+        return;
     image = cv::imread(filename, CV_LOAD_IMAGE_UNCHANGED);
     loaded = true;
 
@@ -28,7 +19,7 @@ inline cv::Mat& Image::getImage() {
         throw std::runtime_error("Couldn't find or read file with image " + filename);
     if (image.type() != CV_8UC4 && image.type() != CV_8UC3)
         throw std::runtime_error("Incorrect type of image " + std::to_string(image.type()));
-    return image;
+    return;
 }
 
 static Pixel* getMatPixel(cv::Mat &image, int x, int y, int left, int top) {

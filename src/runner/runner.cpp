@@ -30,12 +30,15 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver) {
     int num = 0;
     while (!images.empty()) {
         Image &im = images.back();
+        im.loadImage();
+
         if (max(image.top, im.top) >= min(image.top + image.height, im.top + im.height) ||
             max(image.left, im.left) >= min(image.left + image.width, im.left + im.width)) {
             images.pop_back();
             continue;
         }
 
+        //imwrite("result_" + im.filename.substr(im.filename.size() - 7, 3) + ".jpg", im.getImage());
 
         Seam seam = solver.getSeam(image, im);
 
@@ -52,9 +55,9 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver) {
         copyMark.combine(im, seam);
         num++;
 
-        imwrite("result" + to_string(num) + ".jpg", image.getImage());
-        imwrite("result_seam" + to_string(num) + ".jpg", copySeam.getImage());
-        imwrite("result_mark" + to_string(num) + ".jpg", copyMark.getImage());
+        imwrite("result" + to_string(num) + ".jpg", image.image);
+        imwrite("result_seam" + to_string(num) + ".jpg", copySeam.image);
+        imwrite("result_mark" + to_string(num) + ".jpg", copyMark.image);
 
         images.pop_back();
     }
