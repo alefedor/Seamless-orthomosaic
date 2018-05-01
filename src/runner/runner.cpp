@@ -35,8 +35,24 @@ static void eliminateWhite(int x, int y, vector<vector<char>> &used, Image &imag
     for (int i = 0; i < 4; i++) {
         int xx = x + dx[i];
         int yy = y + dy[i];
-        if (image.inside(x, y) && insideArea(x, y) &&!used[yy - iTop][xx - iLeft] && isWhite(image.getPixel(x, y)))
+        if (image.inside(xx, yy) && insideArea(xx, yy) && !used[yy - iTop][xx - iLeft] && isWhite(image.getPixel(xx, yy)))
             eliminateWhite(xx, yy, used, image);
+    }
+}
+
+static void check(int x, int y, Image &im, vector<vector<char>> &used) {
+    if (im.inside(x, y) && insideArea(x, y) && isWhite(im.getPixel(x, y))) {
+        bool good = false;
+        for (int i = 0; i < 4; i++) {
+            int xx = x + dx[i];
+            int yy = y + dy[i];
+            if (!im.inside(xx, yy))
+                good = true;
+        }
+
+        if (good) {
+            eliminateWhite(x, y, used, im);
+        }
     }
 }
 
@@ -73,17 +89,12 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver) {
 
         // WHITE ELIMINATION
 
-        int intersectionTop = std::max(image.top, im.top);
-        int intersectionBottom = std::min(image.top + image.height, im.top + im.height); // bottom not included
+        int intersectionTop = std::max(image.top, im.top) - 1;
+        int intersectionBottom = std::min(image.top + image.height, im.top + im.height) + 1; // bottom not included
         int intersectionHeight = intersectionBottom - intersectionTop;
-        int intersectionLeft = std::max(image.left, im.left);
-        int intersectionRight = std::min(image.left + image.width, im.left + im.width); // right not included
+        int intersectionLeft = std::max(image.left, im.left) - 1;
+        int intersectionRight = std::min(image.left + image.width, im.left + im.width) + 1; // right not included
         int intersectionWidth = intersectionRight - intersectionLeft;
-
-        intersectionLeft--;
-        intersectionBottom--;
-        intersectionHeight += 2;
-        intersectionWidth += 2;
 
         std::vector<std::vector<char> > used;
         used.resize(intersectionHeight, std::vector<char>());
@@ -95,21 +106,14 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver) {
         iTop = intersectionTop;
         iBottom = intersectionBottom;
 
-        for (int y = intersectionTop; y < intersectionBottom; y++)
+        for (int y : {im.top, im.top + im.height - 1})
             for (int x = intersectionLeft; x < intersectionRight; x++)
-                if (im.inside(x, y) && isWhite(im.getPixel(x, y))) {
-                    bool good = false;
-                    for (int i = 0; i < 4; i++) {
-                        int xx = x + dx[i];
-                        int yy = y + dy[i];
-                        if (!im.inside(xx, yy))
-                            good = true;
-                    }
+                check(x, y, im, used);
 
-                    if (good) {
-                        eliminateWhite(x, y, used, im);
-                    }
-                }
+        for (int y = intersectionTop; y < intersectionBottom; y++)
+            for (int x : {im.left, im.left + im.width - 1})
+                check(x, y, im, used);
+
 
         // WHITE ELIMINATION
 

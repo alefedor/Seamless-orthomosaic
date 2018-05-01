@@ -96,7 +96,7 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
             if (a.inside(x, y) && b.inside(x, y))
                 if (pixelEnergy.calcEnergy(x, y) <= r) {
                     Pixel* to = image.data + (image.type() == CV_8UC4 ? 4 : 3) * ((y - intersectionTop) * intersectionWidth + x - intersectionLeft);
-                    Pixel* from = a.getPixel(x, y);
+                    Pixel* from = b.getPixel(x, y);
                     if (image.type() == CV_8UC4)
                         to[3] = 255;
 
