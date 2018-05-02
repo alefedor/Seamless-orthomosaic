@@ -1,20 +1,7 @@
 #include "solutions/mincut.h"
 #include "basic/image.h"
 #include "graph_cut.h"
-
-static int getI(Image &a, int x, int y) {
-    Pixel *p = a.getPixel(x, y);
-    return p[0] + (int)p[1] + p[2];
-}
-
-static int calcEnergy(Image &a, Image &b, int x1, int y1, int x2, int y2) {
-    return (abs(getI(a, x1, y1) - getI(b, x2, y2)) + abs(getI(b, x1, y1) - getI(a, x2, y2))) / 2;
-}
-
-// (x1, y1) in a and not in b, (x2, y2) in b
-static int calcBorderEnergy(Image &a, Image&b, int x1, int y1, int x2, int y2) {
-    return abs(getI(a, x1, y1) - getI(b, x2, y2));
-}
+#include "energy/mincut_energy.h"
 
 static int dx[2] = {1, 0};
 static int dy[2] = {0, 1};
@@ -33,6 +20,8 @@ Seam MinCut::getSeam(Image& a, Image& b) {
     int intersectionWidth = intersectionRight - intersectionLeft;
     if (intersectionHeight < 1 || intersectionWidth < 1)
         return result; // no intersection => no Seam
+
+    MinCutEnergy energy(a, b);
 
     MaxFlow<unsigned int> maxFlow(intersectionWidth * intersectionHeight);
 
@@ -59,20 +48,20 @@ Seam MinCut::getSeam(Image& a, Image& b) {
                 bool ina2 = a.inside(x2, y2);
                 bool inb2 = b.inside(x2, y2);
                 if (ina && ina2 && inb && inb2) {
-                    int energy = calcEnergy(a, b, x, y, x2, y2);
-                    maxFlow.addEdge(id, id2, energy, energy);
+                    int e = energy.calcEnergy(x, y, x2, y2);
+                    maxFlow.addEdge(id, id2, e, e);
                 } else if (ina && !inb && inb2) {
-                    int energy = calcBorderEnergy(a, b, x, y, x2, y2);
-                    maxFlow.addTweights(id2, energy, 0);
+                    int e = energy.calcEnergy(x, y, x2, y2);
+                    maxFlow.addTweights(id2, e, 0);
                 } else if (ina2 && !inb2 && inb) {
-                    int energy = calcBorderEnergy(a, b, x2, y2, x, y);
-                    maxFlow.addTweights(id, energy, 0);
+                    int e = energy.calcEnergy(x, y, x2, y2);
+                    maxFlow.addTweights(id, e, 0);
                 } else if (inb && !ina && ina2) {
-                    int energy = calcBorderEnergy(b, a, x, y, x2, y2);
-                    maxFlow.addTweights(id2, 0, energy);
+                    int e = energy.calcEnergy(x, y, x2, y2);
+                    maxFlow.addTweights(id2, 0, e);
                 } else if (inb2 && !ina2 && ina) {
-                    int energy = calcBorderEnergy(b, a, x2, y2, x, y);
-                    maxFlow.addTweights(id, 0, energy);
+                    int e = energy.calcEnergy(x, y, x2, y2);
+                    maxFlow.addTweights(id, 0, e);
                 }
             }
         }
