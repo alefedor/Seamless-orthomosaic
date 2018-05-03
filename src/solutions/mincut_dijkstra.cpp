@@ -1,8 +1,5 @@
 #include "solutions/mincut_dijkstra.h"
-#include <graph/dfs.h>
-#include <set>
 #include <vector>
-
 #include <opencv2/imgproc/imgproc.hpp> // for bottleneck
 #include <queue>
 #include <energy/mincut_energy.h>

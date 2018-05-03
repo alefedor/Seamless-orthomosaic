@@ -2,6 +2,6 @@
 #include "runner/runner.h"
 
 int main(int argnum, char** args) {
-    Runner::run(argnum, args, MinCut());
+    Runner::run(argnum, args, MinCut(), "_mincut");
     return 0;
 }

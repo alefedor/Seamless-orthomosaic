@@ -25,7 +25,7 @@ static bool hasNear(std::pair<int, int> &a, std::vector<std::pair<int, int>> &v)
 Seam PanDijkstra::getSeam(Image& a, Image& b) {
     //to add: segmentation to PanPixelEnergy
 
-    PanPixelEnergy pixelEnergy(a, b);
+    PanPixelEnergy pixelEnergy(a, b, false);
     PanEnergy energy(pixelEnergy);
 
     Seam result;

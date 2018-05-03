@@ -56,7 +56,7 @@ static void check(int x, int y, Image &im, vector<vector<char>> &used) {
     }
 }
 
-void Runner::run(int argnum, char **args, SeamSolver &&solver) {
+void Runner::run(int argnum, char **args, SeamSolver &&solver, string suffix) {
     if (argnum != 5) {
         cout << "Usage: ./orthomosaic left top width height";
         return;
@@ -134,9 +134,9 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver) {
         copyMark.combine(im, seam);
         num++;
 
-        imwrite("result" + to_string(num) + ".jpg", image.image);
-        imwrite("result_seam" + to_string(num) + ".jpg", copySeam.image);
-        imwrite("result_mark" + to_string(num) + ".jpg", copyMark.image);
+        imwrite("result" + to_string(num) + suffix + ".jpg", image.image);
+        imwrite("result_seam" + to_string(num) + suffix + ".jpg", copySeam.image);
+        imwrite("result_mark" + to_string(num) + suffix + ".jpg", copyMark.image);
 
         images.pop_back();
     }
