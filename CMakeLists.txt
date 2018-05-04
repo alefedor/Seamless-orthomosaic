@@ -19,7 +19,7 @@ include_directories(include)
 include_directories(maxflow_solver)
 
 set(MAXFLOW_SOURCE_FILES maxflow_solver/bk_maxflow/adjacency_list_new_interface/graph.cpp maxflow_solver/bk_maxflow/adjacency_list_new_interface/maxflow.cpp)
-set(ENERGY_FILES src/energy/pan_pixel_energy.cpp src/energy/pan_energy.cpp src/energy/mincut_energy.cpp)
+set(ENERGY_FILES src/energy/pan_pixel_energy.cpp src/energy/pan_energy.cpp src/energy/mincut_energy.cpp src/energy/mincut_energy_mht.cpp)
 set(SOURCE_FILES  src/runner/runner.cpp src/visual/visualizer.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
 set(SOURCE_FILES ${SOURCE_FILES} ${ENERGY_FILES})
 set(NEIGHBOUR_SOURCE_FILES ${SOURCE_FILES} src/orthomosaic_best_neighbour.cpp src/solutions/best_neighbour.cpp)

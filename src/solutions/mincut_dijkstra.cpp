@@ -3,6 +3,7 @@
 #include <opencv2/imgproc/imgproc.hpp> // for bottleneck
 #include <queue>
 #include <energy/mincut_energy.h>
+#include <energy/mincut_energy_mht.h>
 
 
 static int dx[8] = {0, 0, 1, -1, 1, 1, -1, -1};

@@ -47,6 +47,8 @@ Seam MinCut::getSeam(Image& a, Image& b) {
                 int id2 = getId(x2, y2, intersectionTop, intersectionLeft, intersectionWidth);
                 bool ina2 = a.inside(x2, y2);
                 bool inb2 = b.inside(x2, y2);
+
+                //just cases on how intersection area and pixels are connected
                 if (ina && ina2 && inb && inb2) {
                     int e = energy.calcEnergy(x, y, x2, y2);
                     maxFlow.addEdge(id, id2, e, e);
@@ -54,10 +56,10 @@ Seam MinCut::getSeam(Image& a, Image& b) {
                     int e = energy.calcEnergy(x, y, x2, y2);
                     maxFlow.addTweights(id2, e, 0);
                 } else if (ina2 && !inb2 && inb) {
-                    int e = energy.calcEnergy(x, y, x2, y2);
+                    int e = energy.calcEnergy(x2, y2, x, y);
                     maxFlow.addTweights(id, e, 0);
                 } else if (inb && !ina && ina2) {
-                    int e = energy.calcEnergy(x, y, x2, y2);
+                    int e = energy.calcEnergy(x2, y2, x, y);
                     maxFlow.addTweights(id2, 0, e);
                 } else if (inb2 && !ina2 && ina) {
                     int e = energy.calcEnergy(x, y, x2, y2);
