@@ -108,9 +108,8 @@ Seam MinCutDijkstra::getSeam(Image& a, Image& b) {
                     c.first++;
                 if (dy[i] > 0)
                     c.second++;
+                break;
             }
-
-            break;
         }
     }
 
@@ -125,9 +124,9 @@ Seam MinCutDijkstra::getSeam(Image& a, Image& b) {
 
     int inf = std::numeric_limits<int>::max();
     std::vector<std::vector<int>> dist;
-    dist.resize(height, std::vector<int>());
+    dist.resize(height + 1, std::vector<int>());
     for (auto &i : dist)
-        i.resize(width, inf);
+        i.resize(width + 1, inf);
 
     int top = intersectionTop;
     int left = intersectionLeft;
@@ -156,7 +155,7 @@ Seam MinCutDijkstra::getSeam(Image& a, Image& b) {
 
         lastDist = getDist(dist, p, left, top);
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 4; i++) {
             int x = p.first + dx[i];
             int y = p.second + dy[i];
             if (canNormal(a, b, p.first, p.second, x, y)) {
