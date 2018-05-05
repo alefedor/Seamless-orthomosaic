@@ -18,6 +18,18 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(include)
 include_directories(maxflow_solver)
 
+set(SEGM_SOURCES
+        edison_gpu/src/ms_filter_auto.cpp
+        edison_gpu/src/ms_filter_opencl.cpp
+        edison_gpu/src/ms_filter_opencl_kernel_cl.h
+        edison_gpu/src/ms_filter_multithreaded.cpp
+        edison_gpu/src/mean_shift.cpp
+        edison_gpu/segm/ms.cpp
+        edison_gpu/segm/msImageProcessor.cpp
+        edison_gpu/segm/RAList.cpp
+        edison_gpu/segm/rlist.cpp
+        )
+
 set(MAXFLOW_SOURCE_FILES maxflow_solver/bk_maxflow/adjacency_list_new_interface/graph.cpp maxflow_solver/bk_maxflow/adjacency_list_new_interface/maxflow.cpp)
 set(ENERGY_FILES src/energy/pan_pixel_energy.cpp src/energy/pan_energy.cpp src/energy/mincut_energy.cpp src/energy/mincut_energy_mht.cpp)
 set(SOURCE_FILES  src/runner/runner.cpp src/visual/visualizer.cpp src/basic/image.cpp src/basic/reader.cpp src/basic/seam.cpp)
