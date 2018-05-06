@@ -16,7 +16,7 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
         int sigmaS = 6;
         int sigmaR = 4;
         int minArea = 1000;
-        SpeedUpLevel speedupLevel = HIGH_SPEEDUP;
+        SpeedUpLevel speedupLevel = MULTITHREADED_SPEEDUP;
 
         for (int y = intersectionTop; y < intersectionBottom; y++)
             for (int x = intersectionLeft; x < intersectionRight; x++)
