@@ -46,9 +46,11 @@ static inline bool canNormal(Image &a, Image &b, int x1, int y1, int x2, int y2)
             (a.inside(ax2, ay2) && b.inside(ax2, ay2) && (a.inside(ax1, ay1) || b.inside(ax1, ay1)));
 }
 
-// x--o
-// |  |    pixel(x, y)
-// o--o
+// (x,y)---o
+//  |      |
+//  | (x,y)|
+//  |      | 
+//  o------o
 
 // works only when intersection area is a single component
 Seam MinCutDijkstra::getSeam(Image& a, Image& b) {

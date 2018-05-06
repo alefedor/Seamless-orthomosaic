@@ -10,7 +10,7 @@ set(HEADERS
         segm/RAList.h
         segm/rlist.h
         segm/tdef.h
-)
+        )
 
 set(SOURCES
         src/ms_filter_auto.cpp
@@ -22,7 +22,7 @@ set(SOURCES
         segm/msImageProcessor.cpp
         segm/RAList.cpp
         segm/rlist.cpp
-)
+        )
 
 add_subdirectory(thirdparty)
 
