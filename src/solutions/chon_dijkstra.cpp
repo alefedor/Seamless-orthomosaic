@@ -1,8 +1,8 @@
-#include "solutions/pan_dijkstra.h"
+#include "solutions/chon_dijkstra.h"
 #include "bottleneck/dijkstra.h"
 #include "bottleneck/dfs.h"
-#include "energy/pan_energy.h"
-#include "energy/pan_pixel_energy.h"
+#include "energy/chon_energy.h"
+#include "energy/chon_pixel_energy.h"
 #include <set>
 #include <vector>
 
@@ -12,7 +12,7 @@
 static int dx[8] = {0, 0, 1, -1, 1, 1, -1, -1};
 static int dy[8] = {1, -1, 0, 0, -1, 1, 1, -1};
 
-static const int iterCount = 12;
+static const int iterCount = 15;
 
 static bool hasNear(std::pair<int, int> &a, std::vector<std::pair<int, int>> &v) {
     for (auto &b : v)
@@ -22,11 +22,11 @@ static bool hasNear(std::pair<int, int> &a, std::vector<std::pair<int, int>> &v)
 }
 
 // works only when intersection area is a single component
-Seam PanDijkstra::getSeam(Image& a, Image& b) {
+Seam ChonDijkstra::getSeam(Image& a, Image& b) {
     //to add: segmentation to PanPixelEnergy
 
-    PanPixelEnergy pixelEnergy(a, b, false);
-    PanEnergy energy(pixelEnergy);
+    ChonPixelEnergy pixelEnergy(a, b);
+    ChonEnergy energy(a, b);
 
     Seam result;
     int intersectionTop = std::max(a.top, b.top);
@@ -77,7 +77,7 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
     std::pair<int, int> start = intr[0];
     std::pair<int, int> end = intr[1];
 
-    double l = 0, r = 800;
+    double l = 0, r = 1;
     int interCnt = iterCount;
 
     while (interCnt--) {
@@ -104,7 +104,7 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
                         to[i] = from[i];
                 }
 
-    cv::imwrite("result_bottleneck_area.jpg", image);
+    cv::imwrite("result_bottleneck_area_chon.jpg", image);
 
     //VISUALISATION
 

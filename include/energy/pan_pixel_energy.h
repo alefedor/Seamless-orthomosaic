@@ -2,6 +2,7 @@
 
 #include "energy/pixel_energy.h"
 #include "mean_shift.h"
+#include <vector>
 
 class PanPixelEnergy : public PixelEnergy<double> {
  public:
@@ -15,6 +16,6 @@ class PanPixelEnergy : public PixelEnergy<double> {
     Image &a;
     Image &b;
     bool segmented;
-    vector<char> isPR;
-    vector<int> labels;
+    std::vector<char> isPR;
+    std::vector<int> labels;
 };
