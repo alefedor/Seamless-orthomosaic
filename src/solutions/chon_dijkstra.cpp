@@ -105,7 +105,7 @@ Seam ChonDijkstra::getSeam(Image& a, Image& b) {
                         to[i] = from[i];
                 }
 
-    cv::imwrite("result_bottleneck_area_chon.jpg", image);
+    cv::imwrite("chon_dijkstra_bottleneck_area_result.jpg", image);
 
     //VISUALISATION
 

@@ -36,7 +36,7 @@ void Reader::readImages(std::vector<Image> &result) {
     while (!in.eof()) {
         std::string filename;
         getline(in, filename, ',');
-        if (filename.empty())
+        if (filename.empty() || filename == "\n")
             break;
 
         filename = "orthophotos/" + filename + ".jpg";

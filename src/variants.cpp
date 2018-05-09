@@ -10,18 +10,9 @@ bool intersects(int x, int y, int w, int h, Image &m) {
            max(y, m.top) < min(y + h, m.top + m.height);
 }
 
-const int significance = 100;
 
-bool intersectsSignificantly(int x, int y, int w, int h, Image &m) {
-    return max(x, m.left) + significance < min(x + w, m.left + m.width) &&
-           max(y, m.top) + significance < min(y + h, m.top + m.height);
-}
-
-int square(int x, int y, int w, int h, Image &m) {
-    if (!intersects(x, y, w, h, m))
-        return 0;
-
-    return (min(x + w, m.left + m.width)-max(x, m.left)) * (min(y + h, m.top + m.height) - max(y, m.top));
+int square(int l, int t, int r, int b) {
+    return (r - l) * (b - t);
 }
 
 int main(int argnum, char** args) {
@@ -33,51 +24,62 @@ int main(int argnum, char** args) {
     int num = atoi(args[1]);
     int width = atoi(args[2]);
     int height = atoi(args[3]);
-    int s = width * height;
     vector<Image> images;
     int regionWidth;
     int regionHeight;
     Reader::readImages(images);
     Reader::readRegionSize(regionWidth, regionHeight);
-    ofstream out("variants.txt", std::ofstream::out);
-    out << "left top width height number_of_intersections number_of_significant_intersections\n";
+    ofstream out("tests.txt", std::ofstream::out);
+    out << "left top width height im1 im2\n";
     for (int i = 0; i < num; i++) {
-        int x = random() % (regionWidth - width);
-        int y = random() % (regionHeight - height);
-        x -= x % 100;
-        y -= y % 100;
-        int numN = 0;
-        int numS = 0;
-        bool bad = false;
-        int mnx = 1e9, mxx = -1e9, mny = 1e9, mxy = -1e9;
-        for (auto &image : images) {
-            if (intersects(x, y, width, height, image)) {
-                mnx = min(mnx, image.left);
-                mny = min(mny, image.top);
-                mxx = max(mxx, image.left + image.width);
-                mxy = max(mxy, image.top + image.height);
-                numN++;
-                if (intersectsSignificantly(x, y, width, height, image))
-                    numS++;
-                if (square(x, y, width, height, image) > 0.7 * s) {
-                    bad = true;
-                    break;
-                }
+        bool found = false;
+        while (!found) {
+            int x = random() % (regionWidth - width);
+            int y = random() % (regionHeight - height);
+            if (i == 0) {
+                x = 68200 + (7000 - width);
+                y = 21200;
             }
+            x -= x % 100;
+            y -= y % 100;
+            for (auto &im1 : images)
+                if (!found && intersects(x, y, width, height, im1)) {
+                    int t1 = max(y, im1.top);
+                    int l1 = max(x, im1.left);
+                    int r1 = min(x + width, im1.left + im1.width);
+                    int b1 = min(y + height, im1.top + im1.height);
+                    for (auto &im2 : images)
+                        if ((im1.top != im2.top || im1.left != im2.left) && intersects(x, y, width, height, im2)) {
+                            int t2 = max(y, im2.top);
+                            int l2 = max(x, im2.left);
+                            int r2 = min(x + width, im2.left + im2.width);
+                            int b2 = min(y + height, im2.top + im2.height);
+                            if (max(t1, t2) >= min(b1, b2) || max(l1, l2) >= min(r1, r2))
+                                continue;
+
+                            int ti = max(t1, t2);
+                            int li = max(l1, l2);
+                            int ri = min(r1, r2);
+                            int bi = min(b1, b2);
+
+                            int s1 = square(l1, t1, r1, b1);
+                            int s2 = square(l2, t2, r2, b2);
+                            int si = square(li, ti, ri, bi);
+                            int total = width * height;
+
+                            bool good = true;
+                            good &= (si != s1);
+                            good &= (si != s2);
+                            good &= (total * 0.5 < si);
+
+                            if (good) {
+                                found = true;
+                                out << x << " " << y << " " << width << " " << height << " " << im1.filename << " " << im2.filename << "\n";
+                                break;
+                            }
+                        }
+                }
         }
-        if (x + width - mxx > 0.2 * width)
-            bad = true;
-        if (y + height - mxy > 0.2 * height)
-            bad = true;
-        if (mnx - x > 0.2 * width)
-            bad = true;
-        if (mny - y > 0.2 * height)
-            bad = true;
-        if (bad || numS < 2) {
-            i--;
-            continue;
-        }
-        out << x << " " << y << " " << width << " " << height << " " << numN << " " << numS << "\n";
     }
     return 0;
 }

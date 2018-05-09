@@ -2,6 +2,6 @@
 #include "runner/runner.h"
 
 int main(int argnum, char** args) {
-    Runner::run(argnum, args, MinCutDijkstra(), "_mincut_dijkstra");
+    Runner::run(argnum, args, MinCutDijkstra(), "mincut_dijkstra_");
     return 0;
 }

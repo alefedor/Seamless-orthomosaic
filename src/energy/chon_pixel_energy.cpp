@@ -42,7 +42,7 @@ static inline double getNCC(Image &a, Image &b, int x, int y) {
     if (sumf == 0 || sumg == 0)
         return -1;
 
-    return result / sqrt(sumf) / sqrt(sumg);
+    return result / sqrt(sumf * sumg);
 }
 
 ChonPixelEnergy::ChonPixelEnergy(Image &a, Image &b) : a(a), b(b) {
@@ -62,7 +62,7 @@ ChonPixelEnergy::ChonPixelEnergy(Image &a, Image &b) : a(a), b(b) {
             for (int i = 0; i < 3; i++)
                 (im.data + 3 * ((y - top) * width + x - left))[i] = val;
         }
-    cv::imwrite("result_energy_map.jpg", im);
+    cv::imwrite("chon_dijkstra_energy_map_result.jpg", im);
 
     energy.resize(height, std::vector<double>());
     for (int i = 0; i < energy.size(); i++)

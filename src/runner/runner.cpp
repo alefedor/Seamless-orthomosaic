@@ -56,9 +56,9 @@ static void check(int x, int y, Image &im, vector<vector<char>> &used) {
     }
 }
 
-void Runner::run(int argnum, char **args, SeamSolver &&solver, string suffix) {
-    if (argnum != 5) {
-        cout << "Usage: ./orthomosaic left top width height";
+void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
+    if (argnum != 7) {
+        cout << "Usage: ./orthomosaic left top width height image1 image2";
         return;
     }
 
@@ -66,6 +66,9 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string suffix) {
     int top = atoi(args[2]);
     int width = atoi(args[3]);
     int height = atoi(args[4]);
+    vector<string> filenames;
+    filenames.emplace_back(args[5]);
+    filenames.emplace_back(args[6]);
     int PYR_DOWN_COUNT = 1;
 
     //Reader::readRegionSize(width, height);
@@ -79,6 +82,9 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string suffix) {
     while (!images.empty()) {
         Image &im = images.back();
 
+        if (find(filenames.begin(), filenames.end(), im.filename) == filenames.end())
+            continue;
+
         if (max(image.top, im.top) >= min(image.top + image.height, im.top + im.height) ||
             max(image.left, im.left) >= min(image.left + image.width, im.left + im.width)) {
             images.pop_back();
@@ -89,33 +95,45 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string suffix) {
 
         // WHITE ELIMINATION
 
-        int intersectionTop = std::max(image.top, im.top) - 1;
-        int intersectionBottom = std::min(image.top + image.height, im.top + im.height) + 1; // bottom not included
-        int intersectionHeight = intersectionBottom - intersectionTop;
-        int intersectionLeft = std::max(image.left, im.left) - 1;
-        int intersectionRight = std::min(image.left + image.width, im.left + im.width) + 1; // right not included
-        int intersectionWidth = intersectionRight - intersectionLeft;
+        int intersectionTop = std::max(image.top, im.top);
+        int intersectionBottom = std::min(image.top + image.height, im.top + im.height); // bottom not included
+        int intersectionHeight = intersectionBottom - intersectionTop + 2;
+        int intersectionLeft = std::max(image.left, im.left);
+        int intersectionRight = std::min(image.left + image.width, im.left + im.width); // right not included
+        int intersectionWidth = intersectionRight - intersectionLeft + 2;
 
         std::vector<std::vector<char> > used;
         used.resize(intersectionHeight, std::vector<char>());
         for (auto &i : used)
             i.resize(intersectionWidth, false);
 
-        iLeft = intersectionLeft;
-        iRight = intersectionRight;
-        iTop = intersectionTop;
-        iBottom = intersectionBottom;
+        iLeft = intersectionLeft - 1;
+        iRight = intersectionRight + 1;
+        iTop = intersectionTop - 1;
+        iBottom = intersectionBottom + 1;
 
         for (int y : {im.top, im.top + im.height - 1})
-            for (int x = intersectionLeft; x < intersectionRight; x++)
+            for (int x = intersectionLeft - 1; x <= intersectionRight; x++)
                 check(x, y, im, used);
 
-        for (int y = intersectionTop; y < intersectionBottom; y++)
+        for (int y = intersectionTop - 1; y <= intersectionBottom; y++)
             for (int x : {im.left, im.left + im.width - 1})
                 check(x, y, im, used);
 
 
         // WHITE ELIMINATION
+
+        Mat preimage = Mat::zeros(cv::Size(width, height), CV_8UC3);
+        for (int y = intersectionTop; y < intersectionBottom; y++)
+            for (int x = intersectionLeft; x < intersectionRight; x++)
+                if (im.inside(x, y)) {
+                    Pixel *from = im.getPixel(x, y);
+                    Pixel* to = preimage.data + 3 * ((y - top) * width + x - left);
+                    for (int i = 0; i < 3; i++)
+                        to[i] = from[i];
+                }
+
+        imwrite("image" + to_string(num) + "_result.jpg", preimage);
 
         //imwrite("result_" + im.filename.substr(im.filename.size() - 7, 3) + ".jpg", im.getImage());
 
@@ -134,9 +152,9 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string suffix) {
             Visualizer::markImage(im, 1);
             copyMark.combine(im, seam);
 
-            imwrite("result" + to_string(num) + suffix + ".jpg", image.image);
-            imwrite("result_seam" + to_string(num) + suffix + ".jpg", copySeam.image);
-            imwrite("result_mark" + to_string(num) + suffix + ".jpg", copyMark.image);
+            imwrite(prefix + "result" + ".jpg", image.image);
+            imwrite(prefix + "seam_result" + ".jpg", copySeam.image);
+            imwrite(prefix + "mark_result" +".jpg", copyMark.image);
         }
 
         images.pop_back();

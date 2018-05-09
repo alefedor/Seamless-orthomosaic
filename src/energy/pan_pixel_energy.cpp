@@ -69,7 +69,7 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
                     for (int j = 0; j < 3; j++)
                         (im.data + 3 * (y * width + x))[j] = magic[j];
 
-        cv::imwrite("result_segmentation.jpg", im);
+        cv::imwrite("pan_dijkstra_segmentation_result.jpg", im);
     }
 };
 
