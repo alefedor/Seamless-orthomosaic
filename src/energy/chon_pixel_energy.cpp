@@ -1,9 +1,6 @@
 #include "energy/chon_pixel_energy.h"
 
-
-ChonPixelEnergy::ChonPixelEnergy(Image &a, Image &b) : a(a), b(b) {}
-
-const int frameSize = 2;
+const int frameSize = 3;
 
 static inline int getI(Image &a, int x, int y) {
     Pixel* p = a.getPixel(x, y);
@@ -43,11 +40,40 @@ static inline double getNCC(Image &a, Image &b, int x, int y) {
             }
 
     if (sumf == 0 || sumg == 0)
-        return 1;
+        return -1;
 
     return result / sqrt(sumf) / sqrt(sumg);
 }
 
+ChonPixelEnergy::ChonPixelEnergy(Image &a, Image &b) : a(a), b(b) {
+    top =  std::max(a.top, b.top);
+    int bottom = std::min(a.top + a.height, b.top + b.height); // bottom not included
+    int height = bottom - top;
+    left =  std::max(a.left, b.left);
+    int right = std::min(a.left + a.width, b.left + b.width); // right not included
+    int width = right - left;
+
+    cv::Mat im = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
+
+    for (int y = top; y < bottom; y++)
+        for (int x = left; x < right; x++) {
+            int val = calcEnergy(x, y) * 255;
+            assert(0 <= val <= 255);
+            for (int i = 0; i < 3; i++)
+                (im.data + 3 * ((y - top) * width + x - left))[i] = val;
+        }
+    cv::imwrite("result_energy_map.jpg", im);
+
+    energy.resize(height, std::vector<double>());
+    for (int i = 0; i < energy.size(); i++)
+        energy[i].resize(width);
+
+    for (int y = top; y < bottom; y++)
+        for (int x = left; x < right; x++)
+            if (a.inside(x, y) && b.inside(x, y))
+                energy[y - top][x - left] = (1 - getNCC(a, b, x, y)) / 2.0;
+}
+
 double ChonPixelEnergy::calcEnergy(int x, int y) {
-    return (1 - getNCC(a, b, x, y)) / 2.0;
+    return energy[y - top][x - left];
 }

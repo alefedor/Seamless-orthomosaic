@@ -121,22 +121,23 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string suffix) {
 
         Seam seam = solver.getSeam(image, im);
 
-
-        Image copySeam = image.clone();
-        Image copyMark = image.clone();
-
-
         image.combine(im, seam);
 
-        copySeam.combine(im, seam);
-        Visualizer::showSeam(copySeam, seam);
-        Visualizer::markImage(im, 1);
-        copyMark.combine(im, seam);
         num++;
 
-        imwrite("result" + to_string(num) + suffix + ".jpg", image.image);
-        imwrite("result_seam" + to_string(num) + suffix + ".jpg", copySeam.image);
-        imwrite("result_mark" + to_string(num) + suffix + ".jpg", copyMark.image);
+        if (num != 1) {
+            Image copySeam = image.clone();
+            Image copyMark = image.clone();
+
+            copySeam.combine(im, seam);
+            Visualizer::showSeam(copySeam, seam);
+            Visualizer::markImage(im, 1);
+            copyMark.combine(im, seam);
+
+            imwrite("result" + to_string(num) + suffix + ".jpg", image.image);
+            imwrite("result_seam" + to_string(num) + suffix + ".jpg", copySeam.image);
+            imwrite("result_mark" + to_string(num) + suffix + ".jpg", copyMark.image);
+        }
 
         images.pop_back();
     }

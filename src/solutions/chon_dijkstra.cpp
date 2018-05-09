@@ -5,6 +5,7 @@
 #include "energy/chon_pixel_energy.h"
 #include <set>
 #include <vector>
+#include <iostream>
 
 #include <opencv2/imgproc/imgproc.hpp> // for bottleneck
 
@@ -24,9 +25,6 @@ static bool hasNear(std::pair<int, int> &a, std::vector<std::pair<int, int>> &v)
 // works only when intersection area is a single component
 Seam ChonDijkstra::getSeam(Image& a, Image& b) {
     //to add: segmentation to PanPixelEnergy
-
-    ChonPixelEnergy pixelEnergy(a, b);
-    ChonEnergy energy(a, b);
 
     Seam result;
     int intersectionTop = std::max(a.top, b.top);
@@ -73,6 +71,9 @@ Seam ChonDijkstra::getSeam(Image& a, Image& b) {
                                  + std::to_string(intr[2].first) + " "
                                  + std::to_string(intr[2].second) + "; ");
     }
+
+    ChonPixelEnergy pixelEnergy(a, b);
+    ChonEnergy energy(a, b);
 
     std::pair<int, int> start = intr[0];
     std::pair<int, int> end = intr[1];

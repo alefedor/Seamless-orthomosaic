@@ -1,7 +1,7 @@
 #pragma once
 
 #include "energy/pixel_energy.h"
-
+#include <vector>
 
 class ChonPixelEnergy : public PixelEnergy<double> {
 public:
@@ -11,4 +11,6 @@ public:
 private:
     Image &a;
     Image &b;
+    int top, left;
+    std::vector<std::vector<double>> energy;
 };

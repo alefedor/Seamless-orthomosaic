@@ -25,9 +25,6 @@ static bool hasNear(std::pair<int, int> &a, std::vector<std::pair<int, int>> &v)
 Seam PanDijkstra::getSeam(Image& a, Image& b) {
     //to add: segmentation to PanPixelEnergy
 
-    PanPixelEnergy pixelEnergy(a, b, true);
-    PanEnergy energy(pixelEnergy);
-
     Seam result;
     int intersectionTop = std::max(a.top, b.top);
     int intersectionBottom = std::min(a.top + a.height, b.top + b.height); // bottom not included
@@ -73,6 +70,9 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
                                  + std::to_string(intr[2].first) + " "
                                  + std::to_string(intr[2].second) + "; ");
     }
+
+    PanPixelEnergy pixelEnergy(a, b, true);
+    PanEnergy energy(pixelEnergy);
 
     std::pair<int, int> start = intr[0];
     std::pair<int, int> end = intr[1];
