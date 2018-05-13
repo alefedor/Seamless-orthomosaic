@@ -1,6 +1,6 @@
 #include "energy/chon_pixel_energy.h"
 
-const int frameSize = 3;
+static const int frameSize = 3;
 
 static inline int getI(Image &a, int x, int y) {
     Pixel* p = a.getPixel(x, y);
@@ -53,25 +53,29 @@ ChonPixelEnergy::ChonPixelEnergy(Image &a, Image &b) : a(a), b(b) {
     int right = std::min(a.left + a.width, b.left + b.width); // right not included
     int width = right - left;
 
-    cv::Mat im = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
-
-    for (int y = top; y < bottom; y++)
-        for (int x = left; x < right; x++) {
-            int val = calcEnergy(x, y) * 255;
-            assert(0 <= val <= 255);
-            for (int i = 0; i < 3; i++)
-                (im.data + 3 * ((y - top) * width + x - left))[i] = val;
-        }
-    cv::imwrite("chon_dijkstra_energy_map_result.jpg", im);
-
     energy.resize(height, std::vector<double>());
+    #pragma omp parallel for
     for (int i = 0; i < energy.size(); i++)
         energy[i].resize(width);
 
+    #pragma omp parallel for
     for (int y = top; y < bottom; y++)
         for (int x = left; x < right; x++)
             if (a.inside(x, y) && b.inside(x, y))
                 energy[y - top][x - left] = (1 - getNCC(a, b, x, y)) / 2.0;
+
+
+    //VISUALISATION
+    cv::Mat im = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
+
+    #pragma omp parallel for
+    for (int y = top; y < bottom; y++)
+        for (int x = left; x < right; x++) {
+            int val = calcEnergy(x, y) * 255;
+            for (int i = 0; i < 3; i++)
+                (im.data + 3 * ((y - top) * width + x - left))[i] = val;
+        }
+    cv::imwrite("chon_dijkstra_energy_map_result.jpg", im);
 }
 
 double ChonPixelEnergy::calcEnergy(int x, int y) {

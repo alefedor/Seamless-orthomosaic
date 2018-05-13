@@ -37,11 +37,17 @@ void Image::combine(Image& m, Seam& s) {
     for (int y = top; y < top + height; y++)
         for (int x = left; x < left + width; x++) {
             if (!used[y - top][x - left] && inside(x, y) && !m.inside(x, y)) { // in the part that belongs only to the first picture
-                dfs(x, y, used, s, result);               
+                bool bad = false;
+                for (int dy = -3; dy <= 3; dy++)
+                    for (int dx = -3; dx <= 3; dx++)
+                        bad |= m.inside(x + dx, y + dy);
+                if (!bad) // not to close to border
+                    dfs(x, y, used, s, result);
             }
         }  
     
     // the rest should be taken from second picture
+    #pragma omp parallel for
     for (int y = top; y < top + height; y++)
         for (int x = left; x < left + width; x++) 
             if (!used[y - top][x - left]){

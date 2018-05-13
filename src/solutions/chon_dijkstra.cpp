@@ -42,14 +42,15 @@ Seam ChonDijkstra::getSeam(Image& a, Image& b) {
         for (int x = intersectionLeft; x < intersectionRight; x++)
             if (a.inside(x, y) && b.inside(x, y)) {
                 bool good = false;
-                for (int i = 0; i < 8; i++) {
-                    int xx = x + dx[i];
-                    int yy = y + dy[i];
-                    if (!a.inside(xx, yy) && !b.inside(xx, yy)) {
-                        good = true;
-                        break;
+                for (int dy = -2; dy <= 2; dy++)
+                    for (int dx = -2; dx <= 2; dx++){
+                        int xx = x + dx;
+                        int yy = y + dy;
+                        if (!a.inside(xx, yy) && !b.inside(xx, yy)) {
+                            good = true;
+                            break;
+                        }
                     }
-                }
 
                 if (good) {
                     std::pair<int, int> p = {x, y};
@@ -92,6 +93,7 @@ Seam ChonDijkstra::getSeam(Image& a, Image& b) {
     //VISUALISATION
 
     cv::Mat image = cv::Mat::zeros(cv::Size(intersectionWidth, intersectionHeight), CV_8UC4);
+    #pragma omp parallel for
     for (int y = intersectionTop; y < intersectionBottom; y++)
         for (int x = intersectionLeft; x < intersectionRight; x++)
             if (a.inside(x, y) && b.inside(x, y))

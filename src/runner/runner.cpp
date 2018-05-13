@@ -16,6 +16,8 @@ static inline bool isWhite(Pixel* pixel) {
 static int dx[4] = {1, -1, 0, 0};
 static int dy[4] = {0, 0, 1, -1};
 
+static const int lineWidth = 1000;
+
 static int iLeft;
 static int iRight;
 static int iTop;
@@ -82,8 +84,10 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
     while (!images.empty()) {
         Image &im = images.back();
 
-        if (find(filenames.begin(), filenames.end(), im.filename) == filenames.end())
+        if (find(filenames.begin(), filenames.end(), im.filename) == filenames.end()) {
+            images.pop_back();
             continue;
+        }
 
         if (max(image.top, im.top) >= min(image.top + image.height, im.top + im.height) ||
             max(image.left, im.left) >= min(image.left + image.width, im.left + im.width)) {
@@ -102,15 +106,15 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
         int intersectionRight = std::min(image.left + image.width, im.left + im.width); // right not included
         int intersectionWidth = intersectionRight - intersectionLeft + 2;
 
-        std::vector<std::vector<char> > used;
-        used.resize(intersectionHeight, std::vector<char>());
-        for (auto &i : used)
-            i.resize(intersectionWidth, false);
+        iLeft = intersectionLeft - lineWidth;
+        iRight = intersectionRight + lineWidth;
+        iTop = intersectionTop - lineWidth;
+        iBottom = intersectionBottom + lineWidth;
 
-        iLeft = intersectionLeft - 1;
-        iRight = intersectionRight + 1;
-        iTop = intersectionTop - 1;
-        iBottom = intersectionBottom + 1;
+        std::vector<std::vector<char> > used;
+        used.resize(iBottom - iTop, std::vector<char>());
+        for (auto &i : used)
+            i.resize(iRight - iLeft, false);
 
         for (int y : {im.top, im.top + im.height - 1})
             for (int x = intersectionLeft - 1; x <= intersectionRight; x++)
@@ -124,6 +128,7 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
         // WHITE ELIMINATION
 
         Mat preimage = Mat::zeros(cv::Size(width, height), CV_8UC3);
+        #pragma omp parallel for
         for (int y = intersectionTop; y < intersectionBottom; y++)
             for (int x = intersectionLeft; x < intersectionRight; x++)
                 if (im.inside(x, y)) {

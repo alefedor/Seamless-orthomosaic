@@ -1,25 +1,39 @@
 #include "energy/pan_pixel_energy.h"
 
-const int delta = 2100;
+static const int frameSize = 5;
+static const int delta = 1600;
+
+inline double grayscale(Image &a, int x, int y) {
+    Pixel* p = a.getPixel(x, y);
+    return p[0] * 0.114 + p[1] * 0.587 + p[2] * 0.299;
+}
+
+inline double difference(Image &a, Image &b, int x, int y) {
+    return fabs(grayscale(a, x, y) - grayscale(b, x, y));
+}
 
 PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(b), segmented(segmentation) {
-    if (segmentation) {
-        int intersectionTop = top = std::max(a.top, b.top);
-        int intersectionBottom = std::min(a.top + a.height, b.top + b.height); // bottom not included
-        int height = intersectionBottom - intersectionTop;
-        int intersectionLeft = left = std::max(a.left, b.left);
-        int intersectionRight = std::min(a.left + a.width, b.left + b.width); // right not included
-        width = intersectionRight - intersectionLeft;
+    int intersectionTop = top = std::max(a.top, b.top);
+    int bottom = std::min(a.top + a.height, b.top + b.height); // bottom not included
+    int height = bottom - intersectionTop;
+    int intersectionLeft = left = std::max(a.left, b.left);
+    int right = std::min(a.left + a.width, b.left + b.width); // right not included
+    width = right - intersectionLeft;
 
+    std::vector<char> isPR;
+    std::vector<int> labels;
+
+    if (segmentation) {
         cv::Mat im = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
 
         int sigmaS = 6;
         int sigmaR = 4;
         int minArea = 1000;
-        SpeedUpLevel speedupLevel = MULTITHREADED_SPEEDUP;
+        SpeedUpLevel speedupLevel = AUTO_SPEEDUP;
 
-        for (int y = intersectionTop; y < intersectionBottom; y++)
-            for (int x = intersectionLeft; x < intersectionRight; x++)
+        #pragma omp parallel for
+        for (int y = intersectionTop; y < bottom; y++)
+            for (int x = intersectionLeft; x < right; x++)
                 if (a.inside(x, y) && b.inside(x, y)) {
                     Pixel *to = im.data +
                                 (im.type() == CV_8UC4 ? 4 : 3) * ((y - intersectionTop) * width + x - intersectionLeft);
@@ -63,21 +77,50 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
                 isPR[i] = true;
 
 
+        #pragma omp parallel for
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
-                if (isPR[labels[y * width + x]])
+                if (a.inside(x + intersectionLeft, y + intersectionTop) && isPR[labels[y * width + x]])
                     for (int j = 0; j < 3; j++)
                         (im.data + 3 * (y * width + x))[j] = magic[j];
 
         cv::imwrite("pan_dijkstra_segmentation_result.jpg", im);
     }
+
+    energy.resize(height, std::vector<double>());
+    #pragma omp parallel for
+    for (int i = 0; i < energy.size(); i++)
+        energy[i].resize(width, 0);
+
+    #pragma omp parallel for
+    for (int y = top; y < bottom; y++)
+        for (int x = left; x < right; x++)
+            for (int dy = -frameSize; dy <= frameSize; dy++)
+                for (int dx = -frameSize; dx <= frameSize; dx++) {
+                    int xx = x + dx;
+                    int yy = y + dy;
+
+                    if (a.inside(xx, yy) && b.inside(xx, yy)) {
+                        double cost = 3.0 * difference(a, b, xx, yy); // 3 for normalization to [0,765]
+                        if (segmentation)
+                            cost *= (isPR[labels[(yy - top) * width + xx - left]] ? 0.4 : 1);
+                        energy[y - top][x - left] = std::max(energy[y - top][x - left], cost);
+                    }
+                }
+
 };
 
-inline double PanPixelEnergy::getI(Image &a, int x, int y) {
+static inline int mhtDist(Pixel *a, Pixel *b) {
+    return abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2]);
+}
+
+inline int PanPixelEnergy::getI(Image &a, int x, int y) {
     Pixel* p = a.getPixel(x, y);
-    return (p[0] + (int)p[1] + p[2]) * (segmented && isPR[labels[(y - top) * width + x - left]] ? 0.4 : 1);
+    return (p[0] + (int)p[1] + p[2]);
 }
 
 double PanPixelEnergy::calcEnergy(int x, int y) {
-    return fabs(getI(a, x, y) - getI(b, x, y));
+    return energy[y - top][x - left];
+    //return abs(getI(a, x, y) - getI(b, x, y)) * (segmented && isPR[labels[(y - top) * width + x - left]] ? 0.4 : 1);
+    //return mhtDist(a.getPixel(x, y), b.getPixel(x, y)) * (segmented && isPR[labels[(y - top) * width + x - left]] ? 0.4 : 1);
 }
