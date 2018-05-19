@@ -90,7 +90,7 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
                     for (int j = 0; j < 3; j++)
                         (im.data + 3 * (y * width + x))[j] = magic[j];
 
-        cv::imwrite("pan_dijkstra_segmentation_result.jpg", im);
+        cv::imwrite(std::to_string(rand()) + "pan_dijkstra_segmentation_result.jpg", im);
     }
 
     energy.resize(height, std::vector<double>());

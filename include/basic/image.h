@@ -34,7 +34,7 @@ class Image {
     Image clone();
     
  private:
-    void dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv::Mat& result);
+    void dfs(int x, int y, std::vector<std::vector<bool> > &used, Seam &s, cv::Mat& result);
     
     Image& operator=(Image& im) = delete;
 };

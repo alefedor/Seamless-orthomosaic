@@ -16,7 +16,7 @@ static inline bool isWhite(Pixel* pixel) {
 static int dx[4] = {1, -1, 0, 0};
 static int dy[4] = {0, 0, 1, -1};
 
-static const int lineWidth = 1000;
+static const int lineWidth = 500;
 
 static int iLeft;
 static int iRight;

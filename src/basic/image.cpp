@@ -29,8 +29,8 @@ static inline Pixel* getMatPixel(cv::Mat &image, int x, int y, int left, int top
 void Image::combine(Image& m, Seam& s) {
     cv::Mat result = cv::Mat::zeros(cv::Size(width, height), CV_8UC4);
     
-    std::vector<std::vector<char> > used;
-    used.resize(height, std::vector<char>());
+    std::vector<std::vector<bool> > used;
+    used.resize(height, std::vector<bool>());
     for (auto &i : used)
         i.resize(width, false);
        
@@ -66,7 +66,7 @@ void Image::combine(Image& m, Seam& s) {
 static int dx[4] = {1, -1, 0, 0};
 static int dy[4] = {0, 0, 1, -1};
 
-void Image::dfs(int x, int y, std::vector<std::vector<char> > &used, Seam &s, cv::Mat& result) {
+void Image::dfs(int x, int y, std::vector<std::vector<bool> > &used, Seam &s, cv::Mat& result) {
     used[y - top][x - left] = true;
 
     Pixel *pixel = getMatPixel(result, x, y, left, top);
