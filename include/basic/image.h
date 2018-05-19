@@ -36,7 +36,7 @@ class Image {
  private:
     void dfs(int x, int y, std::vector<std::vector<bool> > &used, Seam &s, cv::Mat& result);
     
-    Image& operator=(Image& im) = delete;
+    //Image& operator=(Image& im) = delete; //needed for sort
 };
 
 inline bool Image::inside(int x, int y) {

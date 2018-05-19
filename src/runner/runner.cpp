@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <visual/visualizer.h>
 
 using namespace std;
@@ -58,6 +59,10 @@ static void check(int x, int y, Image &im, vector<vector<char>> &used) {
     }
 }
 
+bool cmpr(Image &a, Image &b) {
+    return a.top + a.left < b.top + b.left;
+}
+
 void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
     if (argnum != 7 && argnum != 5) {
         cout << "Usage: ./orthomosaic left top width height image1 image2\nOr: ./orthomosaic left top width height";
@@ -81,6 +86,8 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
 
     vector<Image> images;
     Reader::readImages(images);
+
+    sort(images.begin(), images.end(), cmpr);
 
     int num = 0;
     while (!images.empty()) {
