@@ -1,7 +1,7 @@
 #include "visual/visualizer.h"
 
 // mi == -1 means "don't change"
-static void mark(Image &a, int x, int y, Pixel m1, Pixel m2, Pixel m3) {
+static void mark(Image &a, int x, int y, int m1, int m2, int m3) {
     Pixel *pixel = a.getPixel(x, y);
     if (m1 != -1)
         pixel[0] = m1;
