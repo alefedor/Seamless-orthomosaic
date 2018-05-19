@@ -10,8 +10,6 @@ class PanPixelEnergy : public PixelEnergy<double> {
     PanPixelEnergy(Image &a, Image &b, bool segmentation);
 
  private:
-    int getI(Image &a, int x, int y);
-
     int top, left, width;
     Image &a;
     Image &b;

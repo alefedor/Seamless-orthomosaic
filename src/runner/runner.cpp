@@ -59,8 +59,8 @@ static void check(int x, int y, Image &im, vector<vector<char>> &used) {
 }
 
 void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
-    if (argnum != 7) {
-        cout << "Usage: ./orthomosaic left top width height image1 image2";
+    if (argnum != 7 && argnum != 5) {
+        cout << "Usage: ./orthomosaic left top width height image1 image2\nOr: ./orthomosaic left top width height";
         return;
     }
 
@@ -69,8 +69,10 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
     int width = atoi(args[3]);
     int height = atoi(args[4]);
     vector<string> filenames;
-    filenames.emplace_back(args[5]);
-    filenames.emplace_back(args[6]);
+    if (argnum == 7) {
+        filenames.emplace_back(args[5]);
+        filenames.emplace_back(args[6]);
+    }
     int PYR_DOWN_COUNT = 1;
 
     //Reader::readRegionSize(width, height);
@@ -84,7 +86,7 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
     while (!images.empty()) {
         Image &im = images.back();
 
-        if (find(filenames.begin(), filenames.end(), im.filename) == filenames.end()) {
+        if (!filenames.empty() && find(filenames.begin(), filenames.end(), im.filename) == filenames.end()) {
             images.pop_back();
             continue;
         }
@@ -140,8 +142,6 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
 
         imwrite("image" + to_string(num) + "_result.jpg", preimage);
 
-        //imwrite("result_" + im.filename.substr(im.filename.size() - 7, 3) + ".jpg", im.getImage());
-
         Seam seam = solver.getSeam(image, im);
 
         image.combine(im, seam);
@@ -157,9 +157,9 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
             Visualizer::markImage(im, 1);
             copyMark.combine(im, seam);
 
-            imwrite(prefix + "result" + ".jpg", image.image);
-            imwrite(prefix + "seam_result" + ".jpg", copySeam.image);
-            imwrite(prefix + "mark_result" +".jpg", copyMark.image);
+            imwrite((filenames.empty() ? "" : to_string(num)) + prefix + "result" + ".jpg", image.image);
+            imwrite((filenames.empty() ? "" : to_string(num)) + prefix + "seam_result" + ".jpg", copySeam.image);
+            imwrite((filenames.empty() ? "" : to_string(num)) + prefix + "mark_result" +".jpg", copyMark.image);
         }
 
         images.pop_back();

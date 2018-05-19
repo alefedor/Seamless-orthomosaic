@@ -3,13 +3,19 @@
 static const int frameSize = 5;
 static const int delta = 1600;
 
+inline int getI(Image &a, int x, int y) {
+    Pixel* p = a.getPixel(x, y);
+    return (p[0] + (int)p[1] + p[2]);
+}
+
 inline double grayscale(Image &a, int x, int y) {
     Pixel* p = a.getPixel(x, y);
     return p[0] * 0.114 + p[1] * 0.587 + p[2] * 0.299;
 }
 
 inline double difference(Image &a, Image &b, int x, int y) {
-    return fabs(grayscale(a, x, y) - grayscale(b, x, y));
+    //return fabs(grayscale(a, x, y) - grayscale(b, x, y)) * 3.0; // 3 for normalization to [0,765]
+    return abs(getI(a, x, y) - getI(b, x, y));
 }
 
 PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(b), segmented(segmentation) {
@@ -101,7 +107,7 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
                     int yy = y + dy;
 
                     if (a.inside(xx, yy) && b.inside(xx, yy)) {
-                        double cost = 3.0 * difference(a, b, xx, yy); // 3 for normalization to [0,765]
+                        double cost = difference(a, b, xx, yy);
                         if (segmentation)
                             cost *= (isPR[labels[(yy - top) * width + xx - left]] ? 0.4 : 1);
                         energy[y - top][x - left] = std::max(energy[y - top][x - left], cost);
@@ -112,11 +118,6 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
 
 static inline int mhtDist(Pixel *a, Pixel *b) {
     return abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2]);
-}
-
-inline int PanPixelEnergy::getI(Image &a, int x, int y) {
-    Pixel* p = a.getPixel(x, y);
-    return (p[0] + (int)p[1] + p[2]);
 }
 
 double PanPixelEnergy::calcEnergy(int x, int y) {
