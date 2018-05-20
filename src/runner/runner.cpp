@@ -28,7 +28,7 @@ static inline bool insideArea(int x, int y) {
     return iLeft <= x && x < iRight && iTop <= y && y < iBottom;
 }
 
-static void eliminateWhite(int x, int y, vector<vector<char>> &used, Image &image) {
+static void eliminateWhite(int x, int y, vector<vector<bool>> &used, Image &image) {
     Pixel *to = image.getPixel(x, y);
     for (int i = 0; i < 3; i++)
         to[i] = magic[i];
@@ -43,7 +43,7 @@ static void eliminateWhite(int x, int y, vector<vector<char>> &used, Image &imag
     }
 }
 
-static void check(int x, int y, Image &im, vector<vector<char>> &used) {
+static void check(int x, int y, Image &im, vector<vector<bool>> &used) {
     if (im.inside(x, y) && insideArea(x, y) && isWhite(im.getPixel(x, y))) {
         bool good = false;
         for (int i = 0; i < 4; i++) {
@@ -87,7 +87,10 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
     vector<Image> images;
     Reader::readImages(images);
 
-    sort(images.begin(), images.end(), cmpr);
+    if (filenames.empty()) {
+        sort(images.begin(), images.end(), cmpr);
+        reverse(images.begin(), images.end());
+    }
 
     int num = 0;
     while (!images.empty()) {
@@ -110,18 +113,16 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
 
         int intersectionTop = std::max(image.top, im.top);
         int intersectionBottom = std::min(image.top + image.height, im.top + im.height); // bottom not included
-        int intersectionHeight = intersectionBottom - intersectionTop + 2;
         int intersectionLeft = std::max(image.left, im.left);
         int intersectionRight = std::min(image.left + image.width, im.left + im.width); // right not included
-        int intersectionWidth = intersectionRight - intersectionLeft + 2;
 
         iLeft = intersectionLeft - lineWidth;
         iRight = intersectionRight + lineWidth;
         iTop = intersectionTop - lineWidth;
         iBottom = intersectionBottom + lineWidth;
 
-        std::vector<std::vector<char> > used;
-        used.resize(iBottom - iTop, std::vector<char>());
+        std::vector<std::vector<bool> > used;
+        used.resize(iBottom - iTop, std::vector<bool>());
         for (auto &i : used)
             i.resize(iRight - iLeft, false);
 
@@ -147,9 +148,19 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
                         to[i] = from[i];
                 }
 
+        Mat dst;
+
+        while (preimage.cols > 1000)
+            pyrDown(preimage, preimage, Size(preimage.cols / 2, preimage.rows / 2));
+
         imwrite("image" + to_string(num) + "_result.jpg", preimage);
 
         Seam seam = solver.getSeam(image, im);
+
+        if (seam.edges.size() == 1) {
+            images.pop_back();
+            continue; // SKIP
+        }
 
         image.combine(im, seam);
 
@@ -164,9 +175,9 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
             Visualizer::markImage(im, 1);
             copyMark.combine(im, seam);
 
-            imwrite((filenames.empty() ? "" : to_string(num)) + prefix + "result" + ".jpg", image.image);
-            imwrite((filenames.empty() ? "" : to_string(num)) + prefix + "seam_result" + ".jpg", copySeam.image);
-            imwrite((filenames.empty() ? "" : to_string(num)) + prefix + "mark_result" +".jpg", copyMark.image);
+            imwrite((!filenames.empty() ? "" : to_string(num)) + prefix + "result" + ".jpg", image.image);
+            imwrite((!filenames.empty() ? "" : to_string(num)) + prefix + "seam_result" + ".jpg", copySeam.image);
+            imwrite((!filenames.empty() ? "" : to_string(num)) + prefix + "mark_result" +".jpg", copyMark.image);
         }
 
         images.pop_back();

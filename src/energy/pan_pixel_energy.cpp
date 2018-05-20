@@ -83,16 +83,69 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
                 isPR[i] = true;
 
 
-        #pragma omp parallel for
+        /*#pragma omp parallel for
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
                 if (a.inside(x + intersectionLeft, y + intersectionTop) && isPR[labels[y * width + x]])
                     for (int j = 0; j < 3; j++)
                         (im.data + 3 * (y * width + x))[j] = magic[j];
 
-        cv::imwrite(std::to_string(rand()) + "pan_dijkstra_segmentation_result.jpg", im);
+        cv::imwrite(std::to_string(rand()) + "pan_dijkstra_segmentation_result.jpg", im);*/
     }
 
+    int gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+    int gy[3][3] = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
+
+/*
+    //EDGE DETECTING
+
+    std::vector<std::vector<int>> gradient;
+    gradient.resize(height, std::vector<int>());
+    #pragma omp parallel for
+    for (int i = 0; i < gradient.size(); i++)
+        gradient[i].resize(width, 0);
+
+    for (int y = top; y < bottom; y++)
+        for (int x = left; x < right; x++)
+            if (a.inside(x, y) && b.inside(x, y)) {
+                int gradxa = 0;
+                int gradya = 0;
+                int gradxb = 0;
+                int gradyb = 0;
+                bool bad = false;
+                for (int i = 0; i < 3; i++)
+                    for (int j = 0; j < 3; j++)
+                        if (a.inside(x + j - 1, y + i - 1) && b.inside(x + j - 1, y + i - 1)) {
+                            gradxa += gx[i][j] * getI(a, x + j - 1, y + i - 1);
+                            gradya += gy[i][j] * getI(a, x + j - 1, y + i - 1);
+                            gradxb += gx[i][j] * getI(b, x + j - 1, y + i - 1);
+                            gradyb += gy[i][j] * getI(b, x + j - 1, y + i - 1);
+                        } else {
+                            bad = true;
+                        }
+                if (!bad)
+                    gradient[y  - intersectionTop][x - intersectionLeft] = abs(gradxa) + abs(gradxb) + abs(gradya) + abs(gradyb);
+            }
+
+    cv::Mat im = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
+
+    const int level = 600;
+
+    for (int y = top; y < bottom; y++)
+        for (int x = left; x < right; x++)
+            if (a.inside(x, y) && b.inside(x, y)) {
+                if (gradient[y - intersectionTop][x - intersectionLeft] >= level) {
+                    Pixel *to = im.data +
+                                (im.type() == CV_8UC4 ? 4 : 3) * ((y - intersectionTop) * width + x - intersectionLeft);
+                    for (int i = 0; i < 3; i++)
+                        to[i] = 255;
+                }
+            }
+
+    cv::imwrite("edges_result.jpg", im);
+
+    //EDGE DETECTING
+*/
     energy.resize(height, std::vector<double>());
     #pragma omp parallel for
     for (int i = 0; i < energy.size(); i++)
@@ -101,18 +154,27 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
     #pragma omp parallel for
     for (int y = top; y < bottom; y++)
         for (int x = left; x < right; x++)
-            for (int dy = -frameSize; dy <= frameSize; dy++)
-                for (int dx = -frameSize; dx <= frameSize; dx++) {
-                    int xx = x + dx;
-                    int yy = y + dy;
+            if (a.inside(x, y) && b.inside(x, y)) {
+                //bool edge = false;
+                for (int dy = -frameSize; dy <= frameSize; dy++)
+                    for (int dx = -frameSize; dx <= frameSize; dx++) {
+                        int xx = x + dx;
+                        int yy = y + dy;
 
-                    if (a.inside(xx, yy) && b.inside(xx, yy)) {
-                        double cost = difference(a, b, xx, yy);
-                        if (segmentation)
-                            cost *= (isPR[labels[(yy - top) * width + xx - left]] ? 0.4 : 1);
-                        energy[y - top][x - left] = std::max(energy[y - top][x - left], cost);
+                        if (a.inside(xx, yy) && b.inside(xx, yy)) {
+                            double cost = difference(a, b, xx, yy);
+                            if (segmentation)
+                                cost *= (isPR[labels[(yy - top) * width + xx - left]] ? 0.4 : 1);
+
+                            /*if (gradient[yy - intersectionTop][xx - intersectionLeft] >= level)
+                                edge = true;*/
+
+                            energy[y - top][x - left] = std::max(energy[y - top][x - left], cost);
+                        }
                     }
-                }
+                //if (edge)
+                //    energy[y - top][x - left] *= 0.7;
+            }
 
 };
 

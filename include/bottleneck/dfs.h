@@ -18,7 +18,7 @@ static inline bool satisfy(int x, int y, std::pair<int, int> start, std::pair<in
 
 template<typename T>
 static bool dfs(Image &a, Image &b, std::pair<int, int> v, std::pair<int, int> &start, std::pair<int, int> &end,
-                int left, int top, std::vector<std::vector<char> > &used, PixelEnergy<T> &energy, T limit) {
+                int left, int top, std::vector<std::vector<bool> > &used, PixelEnergy<T> &energy, T limit) {
     if (v == end)
         return true;
 
@@ -49,8 +49,8 @@ bool hasPath(Image &a, Image &b, std::pair<int, int> start, std::pair<int, int> 
     int intersectionRight = std::min(a.left + a.width, b.left + b.width); // right not included
     int intersectionWidth = intersectionRight - intersectionLeft;
 
-    std::vector<std::vector<char> > used;
-    used.resize(intersectionHeight, std::vector<char>());
+    std::vector<std::vector<bool> > used;
+    used.resize(intersectionHeight, std::vector<bool>());
     for (auto &i : used)
         i.resize(intersectionWidth, false);
 

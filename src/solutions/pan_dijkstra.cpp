@@ -5,6 +5,7 @@
 #include "energy/pan_pixel_energy.h"
 #include <set>
 #include <vector>
+#include <iostream>
 
 #include <opencv2/imgproc/imgproc.hpp> // for bottleneck
 
@@ -23,8 +24,6 @@ static bool hasNear(std::pair<int, int> &a, std::vector<std::pair<int, int>> &v)
 
 // works only when intersection area is a single component
 Seam PanDijkstra::getSeam(Image& a, Image& b) {
-    //to add: segmentation to PanPixelEnergy
-
     Seam result;
     int intersectionTop = std::max(a.top, b.top);
     int intersectionBottom = std::min(a.top + a.height, b.top + b.height); // bottom not included
@@ -58,39 +57,21 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
                 }
             }
 
-    for (int y = intersectionTop; y < intersectionBottom; y++)
-        for (int x = intersectionLeft; x < intersectionRight; x++)
-            if (a.inside(x, y) && b.inside(x, y)) {
-                bool good = false;
-                for (int dy = -2; dy <= 2; dy++)
-                    for (int dx = -2; dx <= 2; dx++){
-                        int xx = x + dx;
-                        int yy = y + dy;
-                        if (!a.inside(xx, yy) && !b.inside(xx, yy)) {
-                            good = true;
-                            break;
-                        }
-                    }
-
-                if (good) {
-                    std::pair<int, int> p = {x, y};
-                    if (!hasNear(p, intr))
-                        intr.push_back(p);
-                }
-            }
-
     if (intr.size() < 2) {
         return result; // one image is in another => no seam is good seam
     }
 
     if (intr.size() > 2) {
-        throw std::runtime_error("Difficult areas of intersection not supported yet (single component required). "
+        std::cout << "Diffucult area of intersection is ignored (photo " + b.filename + ")\n";
+        /*throw std::runtime_error("Difficult areas of intersection not supported yet (single component required). "
                                  + std::to_string(intr[0].first) + " "
                                  + std::to_string(intr[0].second) + "; "
                                  + std::to_string(intr[1].first) + " "
                                  + std::to_string(intr[1].second) + "; "
                                  + std::to_string(intr[2].first) + " "
-                                 + std::to_string(intr[2].second) + "; ");
+                                 + std::to_string(intr[2].second) + "; ");*/
+        result.addEdge(getEdge(0, 0, 0, 1));
+        return result;
     }
 
     PanPixelEnergy pixelEnergy(a, b, true);
@@ -110,6 +91,7 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
             l = m;
     }
 
+
     //VISUALISATION
 
     cv::Mat image = cv::Mat::zeros(cv::Size(intersectionWidth, intersectionHeight), CV_8UC4);
@@ -127,9 +109,11 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
                         to[i] = from[i];
                 }
 
-    cv::imwrite(std::to_string(rand()) + "pan_dijkstra_bottleneck_area_result.jpg", image);
+    //cv::imwrite(std::to_string(rand()) + "pan_dijkstra_bottleneck_area_result.jpg", image);
+    cv::imwrite("pan_dijkstra_bottleneck_area_result.jpg", image);
 
     //VISUALISATION
+
 
     std::vector<std::pair<int, int>> pixels = dijkstra(a, b, start, end, energy, pixelEnergy, r);
     for (auto &a : pixels)
