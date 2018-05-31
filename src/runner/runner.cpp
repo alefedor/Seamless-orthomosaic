@@ -137,6 +137,8 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
 
         // WHITE ELIMINATION
 
+        #ifdef VISUALIZATION
+
         Mat preimage = Mat::zeros(cv::Size(width, height), CV_8UC3);
         #pragma omp parallel for
         for (int y = intersectionTop; y < intersectionBottom; y++)
@@ -155,6 +157,8 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
 
         imwrite("image" + to_string(num) + "_result.jpg", preimage);
 
+        #endif
+
         Seam seam = solver.getSeam(image, im);
 
         if (seam.edges.size() == 1) {
@@ -167,6 +171,8 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
         num++;
 
         if (num != 1) {
+            #ifdef VISUALIZATION
+
             Image copySeam = image.clone();
             Image copyMark = image.clone();
 
@@ -175,9 +181,13 @@ void Runner::run(int argnum, char **args, SeamSolver &&solver, string prefix) {
             Visualizer::markImage(im, 1);
             copyMark.combine(im, seam);
 
-            imwrite((!filenames.empty() ? "" : to_string(num)) + prefix + "result" + ".jpg", image.image);
             imwrite((!filenames.empty() ? "" : to_string(num)) + prefix + "seam_result" + ".jpg", copySeam.image);
             imwrite((!filenames.empty() ? "" : to_string(num)) + prefix + "mark_result" +".jpg", copyMark.image);
+
+            #endif
+
+            imwrite((!filenames.empty() ? "" : to_string(num)) + prefix + "result" + ".jpg", image.image);
+
         }
 
         images.pop_back();

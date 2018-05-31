@@ -63,14 +63,7 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
 
     if (intr.size() > 2) {
         std::cout << "Diffucult area of intersection is ignored (photo " + b.filename + ")\n";
-        /*throw std::runtime_error("Difficult areas of intersection not supported yet (single component required). "
-                                 + std::to_string(intr[0].first) + " "
-                                 + std::to_string(intr[0].second) + "; "
-                                 + std::to_string(intr[1].first) + " "
-                                 + std::to_string(intr[1].second) + "; "
-                                 + std::to_string(intr[2].first) + " "
-                                 + std::to_string(intr[2].second) + "; ");*/
-        result.addEdge(getEdge(0, 0, 0, 1));
+        result.addEdge(getEdge(0, 0, 0, 1)); //crutch to show that ignored
         return result;
     }
 
@@ -91,8 +84,7 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
             l = m;
     }
 
-
-    //VISUALISATION
+    #ifdef VISUALISATION
 
     cv::Mat image = cv::Mat::zeros(cv::Size(intersectionWidth, intersectionHeight), CV_8UC4);
     #pragma omp parallel for
@@ -109,10 +101,9 @@ Seam PanDijkstra::getSeam(Image& a, Image& b) {
                         to[i] = from[i];
                 }
 
-    //cv::imwrite(std::to_string(rand()) + "pan_dijkstra_bottleneck_area_result.jpg", image);
     cv::imwrite("pan_dijkstra_bottleneck_area_result.jpg", image);
 
-    //VISUALISATION
+    #endif
 
 
     std::vector<std::pair<int, int>> pixels = dijkstra(a, b, start, end, energy, pixelEnergy, r);

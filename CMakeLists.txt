@@ -16,7 +16,7 @@ find_package(Threads REQUIRED)
 
 set(CMAKE_BUILD_TYPE Release)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -DVISUALISATION")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
@@ -55,9 +55,9 @@ target_link_libraries(variants ${OpenCV_LIBRARIES})
 
 set(PAN_DIJKSTRA_SOURCE_FILES ${SOURCE_FILES} src/orthomosaic_pan_dijkstra.cpp src/solutions/pan_dijkstra.cpp src/energy/pan_pixel_energy.cpp src/energy/pan_energy.cpp src/energy/pan_differential_energy.cpp)
 set(PAN_DIJKSTRA_SOURCE_FILES ${PAN_DIJKSTRA_SOURCE_FILES})
-add_executable(orthomosaic_pan_dijkstra ${PAN_DIJKSTRA_SOURCE_FILES})
-target_link_libraries(orthomosaic_pan_dijkstra ${EDISON_LIBRARIES})
-target_link_libraries(orthomosaic_pan_dijkstra ${OpenCV_LIBRARIES})
+add_executable(orthomosaic ${PAN_DIJKSTRA_SOURCE_FILES})
+target_link_libraries(orthomosaic ${EDISON_LIBRARIES})
+target_link_libraries(orthomosaic ${OpenCV_LIBRARIES})
 
 set(MC_DIJKSTRA_SOURCE_FILES ${SOURCE_FILES} src/orthomosaic_mincut_dijkstra.cpp src/solutions/mincut_dijkstra.cpp)
 add_executable(orthomosaic_mincut_dijkstra ${MC_DIJKSTRA_SOURCE_FILES})

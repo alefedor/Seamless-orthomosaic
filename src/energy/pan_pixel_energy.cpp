@@ -1,5 +1,7 @@
 #include "energy/pan_pixel_energy.h"
 
+//#define EDGE_DETECTION
+
 static const int frameSize = 5;
 static const int delta = 1600;
 
@@ -83,7 +85,9 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
                 isPR[i] = true;
 
 
-        /*#pragma omp parallel for
+        #ifdef VISUALIZATION
+
+        #pragma omp parallel for
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
                 if (a.inside(x + intersectionLeft, y + intersectionTop) && isPR[labels[y * width + x]])
@@ -91,13 +95,16 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
                         (im.data + 3 * (y * width + x))[j] = magic[j];
 
         cv::imwrite(std::to_string(rand()) + "pan_dijkstra_segmentation_result.jpg", im);*/
+
+        #endif
     }
+
+    #ifdef EDGE_DETECTION
+
+
 
     int gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
     int gy[3][3] = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
-
-/*
-    //EDGE DETECTING
 
     std::vector<std::vector<int>> gradient;
     gradient.resize(height, std::vector<int>());
@@ -144,8 +151,8 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
 
     cv::imwrite("edges_result.jpg", im);
 
-    //EDGE DETECTING
-*/
+    #endif // EDGE_DETECTION
+
     energy.resize(height, std::vector<double>());
     #pragma omp parallel for
     for (int i = 0; i < energy.size(); i++)
@@ -155,7 +162,9 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
     for (int y = top; y < bottom; y++)
         for (int x = left; x < right; x++)
             if (a.inside(x, y) && b.inside(x, y)) {
-                //bool edge = false;
+                #ifdef EDGE_DETECTION
+                bool edge = false;
+                #endif
                 for (int dy = -frameSize; dy <= frameSize; dy++)
                     for (int dx = -frameSize; dx <= frameSize; dx++) {
                         int xx = x + dx;
@@ -166,14 +175,18 @@ PanPixelEnergy::PanPixelEnergy(Image &a, Image &b, bool segmentation) : a(a), b(
                             if (segmentation)
                                 cost *= (isPR[labels[(yy - top) * width + xx - left]] ? 0.4 : 1);
 
-                            /*if (gradient[yy - intersectionTop][xx - intersectionLeft] >= level)
-                                edge = true;*/
+                            #ifdef EDGE_DETECTION
+                            if (gradient[yy - intersectionTop][xx - intersectionLeft] >= level)
+                                edge = true;
+                            #endif
 
                             energy[y - top][x - left] = std::max(energy[y - top][x - left], cost);
                         }
                     }
-                //if (edge)
-                //    energy[y - top][x - left] *= 0.7;
+                #ifdef EDGE_DETECTION
+                if (edge)
+                    energy[y - top][x - left] *= 0.7;
+                #endif
             }
 
 };
@@ -184,6 +197,4 @@ static inline int mhtDist(Pixel *a, Pixel *b) {
 
 double PanPixelEnergy::calcEnergy(int x, int y) {
     return energy[y - top][x - left];
-    //return abs(getI(a, x, y) - getI(b, x, y)) * (segmented && isPR[labels[(y - top) * width + x - left]] ? 0.4 : 1);
-    //return mhtDist(a.getPixel(x, y), b.getPixel(x, y)) * (segmented && isPR[labels[(y - top) * width + x - left]] ? 0.4 : 1);
 }
